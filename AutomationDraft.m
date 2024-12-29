@@ -3,17 +3,22 @@
 
 % Figure out how to load adiconvert 
 
+
+%% Prepatory
+% TODO: make sure Adi is laoded into the workspace
+% TODO: make sure Adi is installed for the user 
 adi.convert("C:\Users\fengy\Desktop\HM\Dr Sayenko Lab\20240826_RTA006_EPA1_RC ONLY.adicht");
 
-
-% Runs AlexConvertFile
+% TODO: run AlexConvertFile
+% TODO: make sure AlexConvertFile is installed for the user, perhaps
+% incorporate his script into mine
 
 
 %% Load data
 
 %first, load AlexChart processed data 
 
-load("Dr Sayenko Lab.mat"); % replace this, eventually, with AlexChart 
+load("Dr Sayenko Lab.mat"); % TODO: replace this, eventually, with AlexChart 
 
 % 
 Data = Labchart.Data          ;
@@ -25,10 +30,6 @@ channel_meta = Labchart.channel_meta  ;
 clearvars Labchart
 
 %% Extract Data
-
-% time ticks in comments (should be 40:120:10, with 3 of each
-% Extract into a cell, each numeric comment, with their corresponding
-% channel and tick number. The cell should be 3 by 3*(120-40)/10
 
 %Filter away repetitive comments
 % Create unique keys for all elements in comments
@@ -44,26 +45,22 @@ clearvars keys uniqueIdx
 
 
 %% Format data
+% Convert all amplitudes into double from string, idk why i dont do int
 for i = 1:numel(filteredComments)
     if ~isempty(regexp(filteredComments(i).str, '^-?\d+$', 'once'))
         filteredComments(i).str = str2double(filteredComments(i).str);
     end
 end
-%Extract amplitude comments 
-% AmplitudeComments = filteredComments(arrayfun(@(x) ~isempty(regexp(x.str, '^-?\d+$', 'once')), filteredComments));
-
-% for i = 1:numel(AmplitudeComments)
-%     AmplitudeComments(i).str = str2double(AmplitudeComments(i).str);
-% end
 
 
 %% Meat of the File
 
-
 %For records 6,12,15 (** Need to generalize)
+% TODO: find a way to automatically locate records we care about 
 
 % *** also, **sort** according to records first, then tick position
 % currently everything is sorted in workspace 
+% TODO: add code that sort according to records then tick position
 
 % For each comment:
 for i = 1:numel(filteredComments)
@@ -117,21 +114,18 @@ end
 %% Export into excel 
 
 
-%Clean up output, s.t. it only contains info we need **PARAMETRIZE
-
-
+% TODO: Clean up output, s.t. it only contains info we need 
+% TODO: add parameters that indicate which fields are needed
 
 %Convert to table to csv & export
 out = struct2table(output);
 writetable(out, "output.csv");
 
 %incorporate plotting in the next draft. 
+%TODO: incorporate plotting and the extraction whereof. 
+
+
+
+
 
 %% Drafting Ground
-
-% %find all the peaks of channel2
-% channel2 = Data{1,6}(2,:);
-% indices = find(channel2 > 1);
-
-%As such, it seems like the window should be about 100 ticks 
-isnumeric(filteredComments(1).str)
