@@ -13,12 +13,17 @@ adi.convert("C:\Users\fengy\Desktop\HM\Dr Sayenko Lab\20240826_RTA006_EPA1_RC ON
 % TODO: make sure AlexConvertFile is installed for the user, perhaps
 % incorporate his script into mine
 
+%% List of parameters 
+
+% window_size: a numbers in ms - the size of the window, after each stimulation, wherein we look for the peak to peak
+% Delay: number in ms, the delay between admitted stimulation and the beginning of the sampling window
+
 
 %% Load data
 
 %first, load AlexChart processed data 
 
-load("Dr Sayenko Lab.mat"); % TODO: replace this, eventually, with AlexChart 
+load("Input/Dr Sayenko Lab.mat"); % TODO: replace this, eventually, with AlexChart 
 
 % 
 Data = Labchart.Data          ;
@@ -52,15 +57,28 @@ for i = 1:numel(filteredComments)
     end
 end
 
+%Sort data first accroding to record, thena ccording to tick_position
+record = [filteredComments.record];
+tick_pos = [filteredComments.tick_position];
+
+[~,sortIdx] = sortrows([record(:), ...
+                tick_pos(:)], ...
+                [1,2]);
+filteredComments = filteredComments(sortIdx);
+
+clearvars sortIdx tick_pos record
 
 %% Meat of the File
 
 %For records 6,12,15 (** Need to generalize)
 % TODO: find a way to automatically locate records we care about 
+filteredComments = filteredComments(arrayfun(@(x) ismember(x.record,[6,12,15]), filteredComments));
 
-% *** also, **sort** according to records first, then tick position
-% currently everything is sorted in workspace 
-% TODO: add code that sort according to records then tick position
+
+window_size = 100;
+R1_delay = 130;
+R2_delay = window_size + R1_delay;
+
 
 % For each comment:
 for i = 1:numel(filteredComments)
@@ -68,18 +86,24 @@ for i = 1:numel(filteredComments)
         x = filteredComments(i);
 %For each stimulation under the amplitude
 %   Find in data{record}, the max - min in the area tick+130 to tick+230
-        windows = Data{x.record}(3:10, x.tick_position+130:x.tick_position+230);
-        maxmin = max(windows, [],2) - min(windows,[],2);
-%   Store this information to maxmin field of filteredcomments
-        filteredComments(i).maxmin = maxmin;
+        % TODO: parameterize 3:10, which stands for the channels
+        windowsr1 = Data{x.record}(3:10, x.tick_position+R1_delay:x.tick_position+R2_delay);
+        maxminr1 = max(windowsr1, [],2) - min(windowsr1,[],2);
 
+        windowsr2 = Data{x.record}(3:10, x.tick_position+R2_delay:x.tick_position+R2_delay+window_size);
+        maxminr2 = max(windowsr2, [],2) - min(windowsr2,[],2);
+%   Store this information to maxminr1 field of filteredcomments
+        filteredComments(i).maxminr1 = maxminr1;
+        filteredComments(i).maxminr2 = maxminr2;
     %else, the fields are empty --> []
 
     end 
 end
+
+clearvars R1_delay R2_delay windowsr2 windowsr1 maxminr2 maxminr1 x i window_size
+
 %%
 
-filteredComments = filteredComments(arrayfun(@(x) ismember(x.record,[6,12,15]), filteredComments));
 
 %   Then, while averaging each max-min, merge elements with same record, amplitude,
 %   and stimulation
@@ -87,15 +111,19 @@ filteredComments = filteredComments(arrayfun(@(x) ismember(x.record,[6,12,15]), 
 % Output 
 lastamp = 1;
 
+
+
 for i = 1:numel(filteredComments)
     x = filteredComments(i);
     if ischar(x.str)
-        filteredComments(lastamp).sum = filteredComments(lastamp).sum + x.maxmin;
+        filteredComments(lastamp).sumr1 = filteredComments(lastamp).sumr1 + x.maxminr1;
+        filteredComments(lastamp).sumr2 = filteredComments(lastamp).sumr2 + x.maxminr2;
         filteredComments(lastamp).count = filteredComments(lastamp).count + 1;
 
     elseif isnumeric(x.str)
         lastamp = i;
-        filteredComments(lastamp).sum = 0;
+        filteredComments(lastamp).sumr1 = 0;
+        filteredComments(lastamp).sumr2 = 0;
         filteredComments(lastamp).count = 0;
        
     end 
@@ -104,26 +132,56 @@ end
 %Outputting
 
 %filter array to only have amplitude left
+%TODO, change the name output here 
 output = filteredComments(arrayfun(@(x) isnumeric(x.str), filteredComments));
+clearvars lastamp
 
-%Calculate average 
+%% Data cleaning
+
+
+% DONE: Clean up output, s.t. it only contains info we need 
+
+%Calculate average  & store into new struct 
+newstructr1 = struct( 'str', {output.str});
+newstructr2 = struct( 'str', {output.str});
+
+
 for i = 1:numel(output)
-    output(i).average = output(i).sum / output(i).count;
+    output(i).averager1 = output(i).sumr1 / output(i).count;
+    output(i).averager2 = output(i).sumr2 / output(i).count;
+
+    for j = 1:numel(output(i).averager1)
+        %store into new struct 
+        % TODO: add parameters that indicate which fields are needed
+
+        % TODO: add checks to include other information
+
+        newstructr1(i).("EMG_Chn_" + int2str(j) + "_r1") = output(i).averager1(j);
+        newstructr2(i).("EMG_Chn_" + int2str(j) + "_r2") = output(i).averager2(j);
+    end
 end 
 
-%% Export into excel 
+clearvars x i maxminr1 j 
 
-
-% TODO: Clean up output, s.t. it only contains info we need 
-% TODO: add parameters that indicate which fields are needed
+%% Exporting to Excel 
 
 %Convert to table to csv & export
-out = struct2table(output);
-writetable(out, "output.csv");
+outr1 = struct2table(newstructr1);
+writetable(outr1, "outputr1.csv");
+
+outr2 = struct2table(newstructr1);
+writetable(outr2, "outputr2.csv");
+
 
 %incorporate plotting in the next draft. 
 %TODO: incorporate plotting and the extraction whereof. 
+%TODO: Draft plotting 
 
+% Plot each channel separately (for channel in list of channels plot
+% plot(amplitude, channel data) --> this way, channel data (in intensity)
+% will be plotted with each channel representing a different line
+
+% As such, the data structure must treat each channel as a separate object
 
 
 

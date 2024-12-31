@@ -1,0 +1,9 @@
+
+
+%% for more colormaps https://matplotlib.org/stable/users/explain/colors/colormaps.html
+% tab10 gives you a color palette of 10 colors 
+% Sequential is the classic, it changes the colors of the line sequentially on a set gradient 
+
+
+
+% Know the difference between {} & [] --> most importantly, when trying to take the data of a column, you have to use {dataframe.column_name}
