@@ -189,9 +189,9 @@ figure;
 hold on;
 
 %First, extract x-axis (str.values)
-
-
+x = [outr1.str]; 
 tab10 = [
+    0.1216, 0.4667, 0.7059;  % Blue
     1.0000, 0.4980, 0.0549;  % Orange
     0.1725, 0.6275, 0.1725;  % Green
     0.8392, 0.1529, 0.1569;  % Red
@@ -201,13 +201,28 @@ tab10 = [
     0.4980, 0.4980, 0.4980;  % Gray
     0.7373, 0.7412, 0.1333;  % Yellow
     0.0902, 0.7451, 0.8118;  % Cyan
-    0.1216, 0.4667, 0.7059;  % Blue
 ];
 
 %Then, for each of the rest of the str columns/for each "EMG_chn_" + i + "r1"
     % channel = outr1.("EMG_Chn_" + i + "_r1")
     % plot(x, channel, ....)   
 
+for i = 1:numel(7)% TODO: turn this into going through each column of the struct instead
+    channel = outr1.("EMG_Chn_" + int2str(i) + "_r1");
+    diplayname = "EMG Chn " + int2str(i) + "_r1";
+    plot(x, channel, "-o", "Color",tab10(mod(i, 10),:), "DisplayName", sprintf(diplayname));
+end
+
+
+% Customize plot
+title('Recruitment Curve');
+xlabel('amplitudes');
+ylabel('Intensity - Volts');
+legend;
+grid on;
+hold off;
+
+saveas(gcf, 'plot.png');
 
 % As such, the data structure must treat each channel as a separate object
 
