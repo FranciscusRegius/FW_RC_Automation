@@ -10,8 +10,7 @@ function confirmation = PlotRC(data, data_range, repetition, bool_normalize)
 
      %DEbug, bool_global_normalization: normalize all data together --> the shape of the plot should look the same as unnormalized 
      % when bool_global_normalization is false, default to normalize
-     % according to one channel (muscle) across all records, s.t. changes
-     % in less stimulated muscles are exaggerrated
+     % according to one channel (muscle) across all records
       
      bool_global_normalization = 1;
 
@@ -23,24 +22,23 @@ function confirmation = PlotRC(data, data_range, repetition, bool_normalize)
      
 
      %Global normalization
-     if bool_normalize 
-         if bool_global_normalization
-             to_normalize = data{:, 2:9};
-            
-            % Normalize across all columns as a single unit (min-max normalization)
-            normalizedData = (to_normalize - min(to_normalize, [], 'all')) / (max(to_normalize, [], 'all') - min(to_normalize, [], 'all'));
-            
-            % Assign normalized values back to the table
-            data{:, 2:9} = normalizedData;
+     if bool_normalize && bool_global_normalization
+         to_normalize = data{:, 2:9};
+        
+        % Normalize across all columns as a single unit (min-max normalization)
+        normalizedData = (to_normalize - min(to_normalize, [], 'all')) / (max(to_normalize, [], 'all') - min(to_normalize, [], 'all'));
+        
+        % Assign normalized values back to the table
+        data{:, 2:9} = normalizedData;
 
-         else 
-            data{:,2:9} = normalize(data{:, 2:9}, 'range'); %TODO: parameterize the number of columns
-         end
+     elseif bool_normalize && ~bool_global_normalization
+        data{:,2:9} = normalize(data{:, 2:9}, 'range'); %TODO: parameterize the number of columns
+
 
         % for col = 2:9
         %     outr3{:, col} = normalize(outr3{:, col}, 'range'); % Min-max normalization for each column
         % end
-        writetable(data, "normalized_data.csv"); % TODO, see if you can give a table a title as a property
+     
      end
 
      %

@@ -178,17 +178,13 @@ writetable(outr2, "outputr2.csv");
 %% Plotting
 
 %incorporate plotting in the next draft. 
-%DONE: incorporate plotting and the extraction whereof. 
-%DONE: Draft plotting 
-%TODO: Parameterize, and make this into a function
-
+PlotRC(outr1, 9, 3, 1);
 
 % Plot each channel separately (for channel in list of channels plot
 % plot(amplitude, channel data) --> this way, channel data (in intensity)
 % will be plotted with each channel representing a different line
-
+% TODO: make this more intuitive... see other file. 
 
 
 
 %% Drafting Ground
-PlotRC(outr1, 9, 3, 0);
