@@ -17,6 +17,8 @@ adi.convert("C:\Users\fengy\Desktop\HM\Dr Sayenko Lab\20240826_RTA006_EPA1_RC ON
 
 % window_size: a numbers in ms - the size of the window, after each stimulation, wherein we look for the peak to peak
 % Delay: number in ms, the delay between admitted stimulation and the beginning of the sampling window
+% bool_normalize: boolean whether or not to normalize the data, default true for now
+bool_normalize = 1; 
 
 
 %% Load data
@@ -185,49 +187,6 @@ writetable(outr2, "outputr2.csv");
 % plot(amplitude, channel data) --> this way, channel data (in intensity)
 % will be plotted with each channel representing a different line
 
-%Pltoting
-
-figure;
-hold on;
-
-%First, extract x-axis (str.values)
-range = 19:27;
-x = outr1.str(range);
-
-
-tab10 = [
-    1.0000, 0.4980, 0.0549;  % Orange
-    0.1725, 0.6275, 0.1725;  % Green
-    0.8392, 0.1529, 0.1569;  % Red
-    0.5804, 0.4039, 0.7412;  % Purple
-    0.5490, 0.3373, 0.2941;  % Brown
-    0.8902, 0.4667, 0.7608;  % Pink
-    0.4980, 0.4980, 0.4980;  % Gray
-    0.7373, 0.7412, 0.1333;  % Yellow
-    0.0902, 0.7451, 0.8118;  % Cyan
-    0.1216, 0.4667, 0.7059;  % Blue
-];
-
-%Then, for each of the rest of the str columns/for each "EMG_chn_" + i + "r1"
-    % channel = outr1.("EMG_Chn_" + i + "_r1")
-    % plot(x, channel, ....)   
-
-for i = 1:8
-    channel = outr1.("EMG_Chn_" + i + "_r1");
-    channel = channel(range);
-    plot(x, channel, "DisplayName","EMG Chn " + i + " r1");
-end
-% As such, the data structure must treat each channel as a separate object
-
-% Customize plot
-title('Recruitment Curve');
-xlabel('amplitudes');
-ylabel('Intensity - Volts');
-legend('Location','best'); % or best outside;
-grid on;
-hold off;
-
-saveas(gcf, 'plot3.png');
 
 
 
