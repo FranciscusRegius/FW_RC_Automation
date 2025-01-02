@@ -176,10 +176,8 @@ writetable(outr2, "outputr2.csv");
 %% Plotting
 
 %incorporate plotting in the next draft. 
-%DONE: incorporate plotting and the extraction whereof. 
-%DONE: Draft plotting 
-%TODO: Parameterize, and make this into a function
-
+%TODO: incorporate plotting and the extraction whereof. 
+%TODO: Draft plotting 
 
 % Plot each channel separately (for channel in list of channels plot
 % plot(amplitude, channel data) --> this way, channel data (in intensity)
@@ -191,8 +189,8 @@ figure;
 hold on;
 
 %First, extract x-axis (str.values)
-range = 19:27;
-x = outr1.str(range);
+
+x = outr1.str()
 
 
 tab10 = [
@@ -212,24 +210,10 @@ tab10 = [
     % channel = outr1.("EMG_Chn_" + i + "_r1")
     % plot(x, channel, ....)   
 
-for i = 1:8
-    channel = outr1.("EMG_Chn_" + i + "_r1");
-    channel = channel(range);
-    plot(x, channel, "DisplayName","EMG Chn " + i + " r1");
-end
+
 % As such, the data structure must treat each channel as a separate object
 
-% Customize plot
-title('Recruitment Curve');
-xlabel('amplitudes');
-ylabel('Intensity - Volts');
-legend('Location','best'); % or best outside;
-grid on;
-hold off;
-
-saveas(gcf, 'plot3.png');
 
 
 
 %% Drafting Ground
-PlotRC(outr1, 9, 3, 0);
