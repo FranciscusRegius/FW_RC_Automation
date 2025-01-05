@@ -1,4 +1,4 @@
-function confirmation = PlotRC(data, data_range, repetition, bool_normalize)
+function confirmation = PlotRC(data, data_range, repetition, bool_normalize,bool_global_normalization)
     
     % data: the struct input, should consists of columns str and emg chns
     % data_range: integer, how many rows should be plotted in one plot ; represents a
@@ -12,19 +12,15 @@ function confirmation = PlotRC(data, data_range, repetition, bool_normalize)
      % when bool_global_normalization is false, default to normalize
      % according to one channel (muscle) across all records, s.t. changes
      % in less stimulated muscles are exaggerrated
-      
-     bool_global_normalization = 1;
 
      str_normalize = "";
-
-     if bool_normalize
-        str_normalize = "normalized";
-     end
-     
+     str_global = "";     
 
      %Global normalization
      if bool_normalize 
+         str_normalize = "normalized";
          if bool_global_normalization
+             str_global = "globally";
              to_normalize = data{:, 2:9};
             
             % Normalize across all columns as a single unit (min-max normalization)
@@ -34,13 +30,14 @@ function confirmation = PlotRC(data, data_range, repetition, bool_normalize)
             data{:, 2:9} = normalizedData;
 
          else 
+            str_global = "permuscle";
             data{:,2:9} = normalize(data{:, 2:9}, 'range'); %TODO: parameterize the number of columns
          end
 
         % for col = 2:9
         %     outr3{:, col} = normalize(outr3{:, col}, 'range'); % Min-max normalization for each column
         % end
-        writetable(data, "normalized_data.csv"); % TODO, see if you can give a table a title as a property
+        writetable(data, "Output/normalized_data.csv"); % TODO, see if you can give a table a title as a property
      end
 
      %
@@ -87,7 +84,7 @@ function confirmation = PlotRC(data, data_range, repetition, bool_normalize)
         grid on;
         hold off;
         
-        saveas(gcf, "plot" + r + str_normalize+ ".png");
+        saveas(gcf, "Output/plot" + r + str_normalize + str_global + ".png");
         clf; 
     end
 

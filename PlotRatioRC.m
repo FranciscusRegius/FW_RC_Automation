@@ -1,4 +1,4 @@
-function confirmation = PlotRC(data, data_range, repetition, bool_normalize)
+function confirmation = PlotRatioRC(data, data_range, repetition, bool_normalize,bool_global_normalization)
     
     % data: the struct input, should consists of columns str and emg chns
     % data_range: integer, how many rows should be plotted in one plot ; represents a
@@ -10,35 +10,34 @@ function confirmation = PlotRC(data, data_range, repetition, bool_normalize)
 
      %DEbug, bool_global_normalization: normalize all data together --> the shape of the plot should look the same as unnormalized 
      % when bool_global_normalization is false, default to normalize
-     % according to one channel (muscle) across all records
-      
-     bool_global_normalization = 1;
+     % according to one channel (muscle) across all records, s.t. changes
+     % in less stimulated muscles are exaggerrated
 
      str_normalize = "";
-
-     if bool_normalize
-        str_normalize = "normalized";
-     end
-     
+     str_global = "";     
 
      %Global normalization
-     if bool_normalize && bool_global_normalization
-         to_normalize = data{:, 2:9};
-        
-        % Normalize across all columns as a single unit (min-max normalization)
-        normalizedData = (to_normalize - min(to_normalize, [], 'all')) / (max(to_normalize, [], 'all') - min(to_normalize, [], 'all'));
-        
-        % Assign normalized values back to the table
-        data{:, 2:9} = normalizedData;
+     if bool_normalize 
+         str_normalize = "normalized";
+         if bool_global_normalization
+             str_global = "globally";
+             to_normalize = data{:, 2:9};
+            
+            % Normalize across all columns as a single unit (min-max normalization)
+            normalizedData = (to_normalize - min(to_normalize, [], 'all')) / (max(to_normalize, [], 'all') - min(to_normalize, [], 'all'));
+            
+            % Assign normalized values back to the table
+            data{:, 2:9} = normalizedData;
 
-     elseif bool_normalize && ~bool_global_normalization
-        data{:,2:9} = normalize(data{:, 2:9}, 'range'); %TODO: parameterize the number of columns
-
+         else 
+            str_global = "permuscle";
+            data{:,2:9} = normalize(data{:, 2:9}, 'range'); %TODO: parameterize the number of columns
+         end
 
         % for col = 2:9
         %     outr3{:, col} = normalize(outr3{:, col}, 'range'); % Min-max normalization for each column
         % end
-     
+        writetable(data, "Output/normalized_data.csv"); % TODO, see if you can give a table a title as a property
      end
 
      %
@@ -71,21 +70,21 @@ function confirmation = PlotRC(data, data_range, repetition, bool_normalize)
             % plot(x, channel, ....)   
         
         for i = 1:8 % TODO: change this st. it just goes through each column one by one
-            channel = data.("EMG_Chn_" + i + "_r1"); %TODO: change this so that it just loops through each column
-            channel = channel(curr_range);
-            plot(x, channel, "DisplayName","EMG Chn " + i + " r1"); % TODO: change dispalyname to be the column name
+            channel = data.("EMG_Chn_" + i + "_r2"); %TODO: change this so that it just loops through each column
+            channel = channel(curr_range); % TODO: make sure to take each column name instead of naming them
+            plot(x, channel, "DisplayName","EMG Chn " + i + "ratio"); % TODO: change dispalyname to be the column name
         end
         % As such, the data structure must treat each channel as a separate object
         
         % Customize plot
-        title("Recruitment Curve" + r);
+        title("R2R1 Ratio Recruitment Curve" + r);
         xlabel('amplitudes');
-        ylabel('Intensity - Volts');
+        ylabel('Ratio, Volts/Volts');
         legend('Location','best'); % or best outside;
         grid on;
         hold off;
         
-        saveas(gcf, "plot" + r + str_normalize+ ".png");
+        saveas(gcf, "Output/r2r1plot" + r + str_normalize + str_global + ".png");
         clf; 
     end
 

@@ -169,22 +169,28 @@ clearvars x i maxminr1 j
 
 %Convert to table to csv & export
 outr1 = struct2table(newstructr1);
-writetable(outr1, "outputr1.csv");
+writetable(outr1, "Output/outputr1.csv");
 
-outr2 = struct2table(newstructr1);
-writetable(outr2, "outputr2.csv");
+outr2 = struct2table(newstructr2);
+writetable(outr2, "Output/outputr2.csv");
 
+%% R2/R1 ratio
+outratio = outr2; % Initialize the new table with outr1's structure
+outratio{:, 2:9} = outr2{:, 2:9} ./ outr1{:, 2:9}; % Element-wise division
 
+writetable(outratio, "Output/outputr2r1ratio.csv");
 %% Plotting
 
 %incorporate plotting in the next draft. 
-PlotRC(outr1, 9, 3, 1);
+PlotRC(outr1, 9, 3, 1,0);
 
 % Plot each channel separately (for channel in list of channels plot
 % plot(amplitude, channel data) --> this way, channel data (in intensity)
 % will be plotted with each channel representing a different line
 % TODO: make this more intuitive... see other file. 
 
+%% Plot R2R1
+PlotRatioRC(outratio,9,3,0,0);
 
 
 %% Drafting Ground
