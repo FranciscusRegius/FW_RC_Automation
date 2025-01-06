@@ -15,11 +15,13 @@ path = "C:\Users\fengy\Desktop\HM\Dr Sayenko Lab\20240826_RTA006_EPA1_RC ONLY.ad
 %% Prepatory
 % TODO: make sure Adi is laoded into the workspace
 % TODO: make sure Adi is installed for the user 
-adi.convert("C:\Users\fengy\Desktop\HM\Dr Sayenko Lab\20240826_RTA006_EPA1_RC ONLY.adicht");
+%%adi.convert("C:\Users\fengy\Desktop\HM\Dr Sayenko Lab\20240826_RTA006_EPA1_RC ONLY.adicht");
 
 % TODO: run AlexConvertFile
+AlexChart(path);
 % TODO: make sure AlexConvertFile is installed for the user, perhaps
-% incorporate his script into mine
+% incorporate his script into mine DONE: this is now a helper function in the
+% github
 
 %% Load data
 
@@ -27,7 +29,7 @@ adi.convert("C:\Users\fengy\Desktop\HM\Dr Sayenko Lab\20240826_RTA006_EPA1_RC ON
 
 load("Input/Dr Sayenko Lab.mat"); % TODO: replace this, eventually, with AlexChart 
 
-% 
+% TODO: this shouldn't be needed once AlexChart is up and running
 Data = Labchart.Data          ;
 file_meta =Labchart.file_meta     ;
 comments =Labchart.comments      ;

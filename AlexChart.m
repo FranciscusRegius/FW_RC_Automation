@@ -16,14 +16,28 @@ function confirmation = AlexChart(fullpath)
     % This modified version of the code requires a specific path input and
     % should be only called in the Automation.m file. 
     
- 
+    %TODO: make sure there are no more TODOs remaining in this file before
+    %moving on to the rest of automation draft
+        
+    %TODO: understand how this file locating works, and understand the
+    %filepath manipulation
+
+    % Locating the files...
+    % The full path is the full path to the folder broken into a cell array
+    fullpath = strsplit(cd, filesep);
+    % Parent is the full path, but in text format
+    parent   = fullfile(fullpath{1:end},filesep);
+    % Get all LabChart files (should be just one!!!!)
+    files    = dir([parent '\*.adicht']);
+    
     %% Step 1: Now with adi.convert step!
     
     
     fprintf('\n===== Step 1: Convert the data! =====\n\n');
     
     % This is an awesome utility, that has a horrible output...
-    adi.convert(fullfile(parent,files(1).name));
+    % TODO: make sure this readas from Input 
+    adi.convert(fullfile(parent,files(1).name)); 
     
     fprintf('\n Done...\n\n');
     
@@ -123,6 +137,7 @@ function confirmation = AlexChart(fullpath)
     fprintf('\n===== Step 5: Save the data! =====\n\n');
     
     % FINAL STEP - SAVE DATA!!!
+    % TODO: change save name s.t. it gets saved in Input folder
     save([parent, fullpath{end}, '.mat'],'Labchart')
     % save([savedir,savename '.set'],'EEG')
     
