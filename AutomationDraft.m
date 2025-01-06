@@ -4,6 +4,14 @@
 % Figure out how to load adiconvert 
 
 
+%% List of parameters 
+
+% window_size: a numbers in ms - the size of the window, after each stimulation, wherein we look for the peak to peak
+% Delay: number in ms, the delay between admitted stimulation and the beginning of the sampling window
+% bool_normalize: boolean whether or not to normalize the data, default true for now
+bool_normalize = 1; 
+path = "C:\Users\fengy\Desktop\HM\Dr Sayenko Lab\20240826_RTA006_EPA1_RC ONLY.adicht";
+
 %% Prepatory
 % TODO: make sure Adi is laoded into the workspace
 % TODO: make sure Adi is installed for the user 
@@ -12,14 +20,6 @@ adi.convert("C:\Users\fengy\Desktop\HM\Dr Sayenko Lab\20240826_RTA006_EPA1_RC ON
 % TODO: run AlexConvertFile
 % TODO: make sure AlexConvertFile is installed for the user, perhaps
 % incorporate his script into mine
-
-%% List of parameters 
-
-% window_size: a numbers in ms - the size of the window, after each stimulation, wherein we look for the peak to peak
-% Delay: number in ms, the delay between admitted stimulation and the beginning of the sampling window
-% bool_normalize: boolean whether or not to normalize the data, default true for now
-bool_normalize = 1; 
-
 
 %% Load data
 
