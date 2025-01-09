@@ -1,4 +1,6 @@
-function confirmation = AlexChart(path)
+function newfilepath = AlexChart(path)
+    %Alternatively, output the 5 data structs that I need to use
+
     % ADI Convert creates a file that is just awful. Each channel gets its own
     % variable and each recording gets its own variable, we can do better.
     % We have the technology. This code SHOULD combine all the channels from
@@ -40,7 +42,8 @@ function confirmation = AlexChart(path)
     
     % This is an awesome utility, that has a horrible output...
     % TODO: make sure this readas from Input 
-    adi.convert(path); 
+    path_ext = [path,'.adicht'];
+    adi.convert(path_ext); 
     
     fprintf('\n Done...\n\n');
     
@@ -48,7 +51,7 @@ function confirmation = AlexChart(path)
     
     fprintf('\n===== Step 1.5: Load the data! =====\n\n');
     
-    matfile_name = strsplit(path, ".");
+    matfile_name = strsplit(path_ext, ".");
     load(matfile_name(1) + ".mat");
     
     fprintf('\n Done...\n\n');
@@ -130,7 +133,7 @@ function confirmation = AlexChart(path)
     Labchart.comments     = comments;
     Labchart.file_meta    = file_meta;
     Labchart.Data         = Data;
-    
+    tester = 1;
     % Boom! 
     fprintf('\n Done...\n\n');
     
@@ -140,9 +143,10 @@ function confirmation = AlexChart(path)
     
     % FINAL STEP - SAVE DATA!!!
     % TODO: change save name s.t. it gets saved in Input folder
-    save([parent, fullpath{end}, '.mat'],'Labchart')
+    newfilepath = [path, '.mat'];
+    save(newfilepath,'Labchart')
     % save([savedir,savename '.set'],'EEG')
     
     fprintf('\n Done...\n\n');
-    confirmation = 1;
+
 end

@@ -10,18 +10,19 @@
 % Delay: number in ms, the delay between admitted stimulation and the beginning of the sampling window
 % bool_normalize: boolean whether or not to normalize the data, default true for now
 bool_normalize = 1; 
-path = "C:\Users\fengy\Desktop\HM\Dr Sayenko Lab\Input\20240826_RTA006_EPA1_RC ONLY.adicht";
+file_name = '20240826_RTA006_EPA1_RC ONLY';
+path = [cd, '\Input\', file_name];
+% path = 'C:\Users\fengy\Desktop\HM\Dr Sayenko Lab\FW_RC_Automation\20240826_RTA006_EPA1_RC ONLY.adicht'  ; %DEBUGGING:
 % TODO: Add a check to make sure takes you to a .adicht or .mat file 
 
 
-
-%% Prepatory
+%% Preprocessing
 % TODO: make sure Adi is laoded into the workspace
 % TODO: make sure Adi is installed for the user 
 %%adi.convert("C:\Users\fengy\Desktop\HM\Dr Sayenko Lab\20240826_RTA006_EPA1_RC ONLY.adicht");
 
-% TODO: run AlexConvertFile
-AlexChart(path); % This should load everything into workspace 
+% DONE: run AlexConvertFile
+newfilepath = AlexChart(path); % This should load everything into workspace 
 % TODO: make sure AlexConvertFile is installed for the user, perhaps
 % incorporate his script into mine DONE: this is now a helper function in the
 % github
@@ -30,9 +31,9 @@ AlexChart(path); % This should load everything into workspace
 
 %first, load AlexChart processed data 
 
-load("Input/Dr Sayenko Lab.mat"); % TODO: replace this, eventually, with AlexChart 
+load(newfilepath); % DONE: replace this, eventually, with AlexChart 
 
-% TODO: this shouldn't be needed once AlexChart is up and running
+% TODO: Decicde whether to have the data directly output by AlexChart function or save & load 
 Data = Labchart.Data          ;
 file_meta =Labchart.file_meta     ;
 comments =Labchart.comments      ;

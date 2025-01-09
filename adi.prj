@@ -1,0 +1,103 @@
+<deployment-project plugin="plugin.apptool" plugin-version="1.0">
+  <configuration build-checksum="152537155" file="C:\Users\fengy\Desktop\HM\Dr Sayenko Lab\FW_RC_Automation\adi.prj" location="C:\Users\fengy\Desktop\HM\Dr Sayenko Lab\FW_RC_Automation" name="adi" target="target.mlapps" target-name="Package App">
+    <param.appname>adi</param.appname>
+    <param.authnamewatermark>Jim Hokason</param.authnamewatermark>
+    <param.email />
+    <param.company />
+    <param.icon />
+    <param.icons />
+    <param.summary />
+    <param.description>Coverts .adicht to .mat files</param.description>
+    <param.screenshot />
+    <param.version>1.0</param.version>
+    <param.products.name />
+    <param.products.id />
+    <param.products.version />
+    <param.platforms>
+      <item>win64</item>
+    </param.platforms>
+    <param.output>${PROJECT_ROOT}\Input</param.output>
+    <param.guid>844c28d3-5c7c-44f1-96e5-4183649c79ce</param.guid>
+    <unset>
+      <param.email />
+      <param.company />
+      <param.icon />
+      <param.icons />
+      <param.summary />
+      <param.screenshot />
+      <param.version />
+      <param.products.name />
+      <param.products.id />
+      <param.products.version />
+    </unset>
+    <fileset.main>
+      <file>C:\Users\fengy\Documents\MATLAB\adinstruments_sdk_matlab-master\adi.m</file>
+    </fileset.main>
+    <fileset.depfun>
+      <file>C:\Users\fengy\Documents\MATLAB\adinstruments_sdk_matlab-master\+adi\+sl\+array\uniqueWithGroupIndices.m</file>
+      <file>C:\Users\fengy\Documents\MATLAB\adinstruments_sdk_matlab-master\+adi\+sl\+cellstr\contains.m</file>
+      <file>C:\Users\fengy\Documents\MATLAB\adinstruments_sdk_matlab-master\+adi\+sl\+cellstr\join.m</file>
+      <file>C:\Users\fengy\Documents\MATLAB\adinstruments_sdk_matlab-master\+adi\+sl\+datetime\getTimeZone.m</file>
+      <file>C:\Users\fengy\Documents\MATLAB\adinstruments_sdk_matlab-master\+adi\+sl\+datetime\unixToMatlab.m</file>
+      <file>C:\Users\fengy\Documents\MATLAB\adinstruments_sdk_matlab-master\+adi\+sl\+dir\changeFileExtension.m</file>
+      <file>C:\Users\fengy\Documents\MATLAB\adinstruments_sdk_matlab-master\+adi\+sl\+dir\createFolderIfNoExist.m</file>
+      <file>C:\Users\fengy\Documents\MATLAB\adinstruments_sdk_matlab-master\+adi\+sl\+dir\filepartsx.m</file>
+      <file>C:\Users\fengy\Documents\MATLAB\adinstruments_sdk_matlab-master\+adi\+sl\+in\process_varargin_result.m</file>
+      <file>C:\Users\fengy\Documents\MATLAB\adinstruments_sdk_matlab-master\+adi\+sl\+in\processVarargin.m</file>
+      <file>C:\Users\fengy\Documents\MATLAB\adinstruments_sdk_matlab-master\+adi\+sl\+stack\calling_function_info.m</file>
+      <file>C:\Users\fengy\Documents\MATLAB\adinstruments_sdk_matlab-master\+adi\+sl\+stack\getMyBasePath.m</file>
+      <file>C:\Users\fengy\Documents\MATLAB\adinstruments_sdk_matlab-master\+adi\+sl\+stack\getPackageRoot.m</file>
+      <file>C:\Users\fengy\Documents\MATLAB\adinstruments_sdk_matlab-master\+adi\+sl\+str\contains.m</file>
+      <file>C:\Users\fengy\Documents\MATLAB\adinstruments_sdk_matlab-master\+adi\@channel\channel.m</file>
+      <file>C:\Users\fengy\Documents\MATLAB\adinstruments_sdk_matlab-master\+adi\@channel\exportToHDF5File.m</file>
+      <file>C:\Users\fengy\Documents\MATLAB\adinstruments_sdk_matlab-master\+adi\@comment\comment.m</file>
+      <file>C:\Users\fengy\Documents\MATLAB\adinstruments_sdk_matlab-master\+adi\@file_viewer\file_viewer.m</file>
+      <file>C:\Users\fengy\Documents\MATLAB\adinstruments_sdk_matlab-master\+adi\comment_handle.m</file>
+      <file>C:\Users\fengy\Documents\MATLAB\adinstruments_sdk_matlab-master\+adi\data_writer_handle.m</file>
+      <file>C:\Users\fengy\Documents\MATLAB\adinstruments_sdk_matlab-master\+adi\file.m</file>
+      <file>C:\Users\fengy\Documents\MATLAB\adinstruments_sdk_matlab-master\+adi\file_handle.m</file>
+      <file>C:\Users\fengy\Documents\MATLAB\adinstruments_sdk_matlab-master\+adi\file_read_options.m</file>
+      <file>C:\Users\fengy\Documents\MATLAB\adinstruments_sdk_matlab-master\+adi\h5_conversion_options.m</file>
+      <file>C:\Users\fengy\Documents\MATLAB\adinstruments_sdk_matlab-master\+adi\h5_file_h.m</file>
+      <file>C:\Users\fengy\Documents\MATLAB\adinstruments_sdk_matlab-master\+adi\h5_file_sdk.m</file>
+      <file>C:\Users\fengy\Documents\MATLAB\adinstruments_sdk_matlab-master\+adi\handle_logger.m</file>
+      <file>C:\Users\fengy\Documents\MATLAB\adinstruments_sdk_matlab-master\+adi\handle_manager.m</file>
+      <file>C:\Users\fengy\Documents\MATLAB\adinstruments_sdk_matlab-master\+adi\mat_comment_handle.m</file>
+      <file>C:\Users\fengy\Documents\MATLAB\adinstruments_sdk_matlab-master\+adi\mat_conversion_options.m</file>
+      <file>C:\Users\fengy\Documents\MATLAB\adinstruments_sdk_matlab-master\+adi\mat_file_h.m</file>
+      <file>C:\Users\fengy\Documents\MATLAB\adinstruments_sdk_matlab-master\+adi\mat_file_sdk.m</file>
+      <file>C:\Users\fengy\Documents\MATLAB\adinstruments_sdk_matlab-master\+adi\private\c.m</file>
+      <file>C:\Users\fengy\Documents\MATLAB\adinstruments_sdk_matlab-master\+adi\private\c0.m</file>
+      <file>C:\Users\fengy\Documents\MATLAB\adinstruments_sdk_matlab-master\+adi\private\clong.m</file>
+      <file>C:\Users\fengy\Documents\MATLAB\adinstruments_sdk_matlab-master\+adi\private\sdk_mex.mexw64</file>
+      <file>C:\Users\fengy\Documents\MATLAB\adinstruments_sdk_matlab-master\+adi\readFile.m</file>
+      <file>C:\Users\fengy\Documents\MATLAB\adinstruments_sdk_matlab-master\+adi\record.m</file>
+      <file>C:\Users\fengy\Documents\MATLAB\adinstruments_sdk_matlab-master\+adi\sdk.m</file>
+    </fileset.depfun>
+    <fileset.resources />
+    <fileset.package />
+    <build-deliverables>
+      <file location="${PROJECT_ROOT}" name="Input" optional="false">C:\Users\fengy\Desktop\HM\Dr Sayenko Lab\FW_RC_Automation\Input</file>
+    </build-deliverables>
+    <workflow />
+    <matlab>
+      <root>C:\Program Files\MATLAB\R2024a</root>
+      <toolboxes />
+    </matlab>
+    <platform>
+      <unix>false</unix>
+      <mac>false</mac>
+      <windows>true</windows>
+      <win2k>false</win2k>
+      <winxp>false</winxp>
+      <vista>false</vista>
+      <linux>false</linux>
+      <solaris>false</solaris>
+      <osver>10.0</osver>
+      <os32>false</os32>
+      <os64>true</os64>
+      <arch>win64</arch>
+      <matlab>true</matlab>
+    </platform>
+  </configuration>
+</deployment-project>
