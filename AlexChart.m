@@ -1,4 +1,4 @@
-function confirmation = AlexChart(fullpath)
+function confirmation = AlexChart(path)
     % ADI Convert creates a file that is just awful. Each channel gets its own
     % variable and each recording gets its own variable, we can do better.
     % We have the technology. This code SHOULD combine all the channels from
@@ -22,22 +22,25 @@ function confirmation = AlexChart(fullpath)
     %TODO: understand how this file locating works, and understand the
     %filepath manipulation
 
-    % Locating the files...
-    % The full path is the full path to the folder broken into a cell array
-    fullpath = strsplit(cd, filesep);
-    % Parent is the full path, but in text format
-    parent   = fullfile(fullpath{1:end},filesep);
-    % Get all LabChart files (should be just one!!!!)
-    files    = dir([parent '\*.adicht']);
+    % % Locating the files...
+    % % The full path is the full path to the folder broken into a cell array
+    % fullpath = strsplit(cd, filesep);
+    % % Parent is the full path, but in text format
+    % parent   = fullfile(fullpath{1:end},filesep);
+    % % Get all LabChart files (should be just one!!!!)
+    % files    = dir([parent '\*.adicht']);
     
     %% Step 1: Now with adi.convert step!
     
-    
+    %TODO: add a try catch for if non-fullpath, look for parent + input +
+    %files(1).name. Perhaps also add a confirmation s.t. if a bad path is
+    %entereed it prompts and asks if they want the correct file ...
+    % But this should not be necssary with drag n' drop
     fprintf('\n===== Step 1: Convert the data! =====\n\n');
     
     % This is an awesome utility, that has a horrible output...
     % TODO: make sure this readas from Input 
-    adi.convert(fullfile(parent,files(1).name)); 
+    adi.convert(path); 
     
     fprintf('\n Done...\n\n');
     
@@ -45,9 +48,8 @@ function confirmation = AlexChart(fullpath)
     
     fprintf('\n===== Step 1.5: Load the data! =====\n\n');
     
-    files    = dir([parent '\*.mat']); %TODO: figure out what the "dir" function does
-    %TODO: implement file name manipulation s.t. parent
-    load(fullfile(parent,files(1).name));
+    matfile_name = strsplit(path, ".");
+    load(matfile_name(1) + ".mat");
     
     fprintf('\n Done...\n\n');
     
@@ -142,4 +144,5 @@ function confirmation = AlexChart(fullpath)
     % save([savedir,savename '.set'],'EEG')
     
     fprintf('\n Done...\n\n');
+    confirmation = 1;
 end

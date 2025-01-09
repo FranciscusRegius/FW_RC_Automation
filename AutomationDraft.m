@@ -10,7 +10,10 @@
 % Delay: number in ms, the delay between admitted stimulation and the beginning of the sampling window
 % bool_normalize: boolean whether or not to normalize the data, default true for now
 bool_normalize = 1; 
-path = "C:\Users\fengy\Desktop\HM\Dr Sayenko Lab\20240826_RTA006_EPA1_RC ONLY.adicht";
+path = "C:\Users\fengy\Desktop\HM\Dr Sayenko Lab\Input\20240826_RTA006_EPA1_RC ONLY.adicht";
+% TODO: Add a check to make sure takes you to a .adicht or .mat file 
+
+
 
 %% Prepatory
 % TODO: make sure Adi is laoded into the workspace
@@ -18,7 +21,7 @@ path = "C:\Users\fengy\Desktop\HM\Dr Sayenko Lab\20240826_RTA006_EPA1_RC ONLY.ad
 %%adi.convert("C:\Users\fengy\Desktop\HM\Dr Sayenko Lab\20240826_RTA006_EPA1_RC ONLY.adicht");
 
 % TODO: run AlexConvertFile
-AlexChart(path);
+AlexChart(path); % This should load everything into workspace 
 % TODO: make sure AlexConvertFile is installed for the user, perhaps
 % incorporate his script into mine DONE: this is now a helper function in the
 % github
