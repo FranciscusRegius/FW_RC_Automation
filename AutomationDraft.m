@@ -25,7 +25,8 @@ fprintf(['\n ===== Opening file ' file_name ' with Alex Chart =====\n\n'] );
 %%adi.convert("C:\Users\fengy\Desktop\HM\Dr Sayenko Lab\20240826_RTA006_EPA1_RC ONLY.adicht");
 
 %%TODO: Find whatever adi's path is and add path to matlab path 
-% addpath adi_path %Code
+% adi_path = [cd filesep ''];
+addpath adinstruments_sdk_matlab-master %Code
 
 % DONE: run AlexConvertFile
 newfilepath = AlexChart(path); % This should load everything into workspace 

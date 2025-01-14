@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.apptool" plugin-version="1.0">
-  <configuration file="C:\Users\fengy\Desktop\HM\Dr Sayenko Lab\FW_RC_Automation\adi.prj" location="C:\Users\fengy\Desktop\HM\Dr Sayenko Lab\FW_RC_Automation" name="adi" target="target.mlapps" target-name="Package App">
+  <configuration build-checksum="180163261" file="C:\Users\fengy\Desktop\HM\Dr Sayenko Lab\FW_RC_Automation\adi.prj" location="C:\Users\fengy\Desktop\HM\Dr Sayenko Lab\FW_RC_Automation" name="adi" target="target.mlapps" target-name="Package App">
     <param.appname>adi</param.appname>
     <param.authnamewatermark />
     <param.email />
@@ -13,9 +13,11 @@
     <param.products.name />
     <param.products.id />
     <param.products.version />
-    <param.platforms />
+    <param.platforms>
+      <item>win64</item>
+    </param.platforms>
     <param.output>${PROJECT_ROOT}</param.output>
-    <param.guid>20d9fae0-d794-49f4-927f-a7da222ffacf</param.guid>
+    <param.guid>58c2281a-3af3-482a-be55-a17dd2d6ae1f</param.guid>
     <unset>
       <param.authnamewatermark />
       <param.email />
@@ -29,14 +31,15 @@
       <param.products.name />
       <param.products.id />
       <param.products.version />
-      <param.platforms />
       <param.output />
     </unset>
     <fileset.main>
       <file>${PROJECT_ROOT}\adinstruments_sdk_matlab-master\adi.m</file>
     </fileset.main>
     <fileset.depfun />
-    <fileset.resources />
+    <fileset.resources>
+      <file>${PROJECT_ROOT}\adinstruments_sdk_matlab-master\+adi</file>
+    </fileset.resources>
     <fileset.package />
     <build-deliverables>
       <file location="C:\Users\fengy\Desktop\HM\Dr Sayenko Lab" name="FW_RC_Automation" optional="false">C:\Users\fengy\Desktop\HM\Dr Sayenko Lab\FW_RC_Automation</file>
