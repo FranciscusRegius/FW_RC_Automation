@@ -12,6 +12,9 @@
 bool_normalize = 1; 
 file_name = '20240826_RTA006_EPA1_RC ONLY';
 path = [cd, '\Input\', file_name];
+
+fprintf(['\n ===== Opening file ' file_name ' with Alex Chart =====\n\n'] );
+
 % path = 'C:\Users\fengy\Desktop\HM\Dr Sayenko Lab\FW_RC_Automation\20240826_RTA006_EPA1_RC ONLY.adicht'  ; %DEBUGGING:
 % TODO: Add a check to make sure takes you to a .adicht or .mat file 
 
@@ -46,6 +49,8 @@ clearvars Labchart
 
 %Filter away repetitive comments
 % Create unique keys for all elements in comments
+fprintf('\n ===== Filtering Comments =====\n\n' );
+
 keys = arrayfun(@(x) sprintf('%s_%d_%s', x.str, x.tick_position, x.record), comments, "UniformOutput",false);
 
 %find unique elements based on the keys
@@ -58,6 +63,9 @@ clearvars keys uniqueIdx
 
 
 %% Format data
+
+fprintf('\n ===== Formatting Data =====\n\n' );
+
 % Convert all amplitudes into double from string, idk why i dont do int
 for i = 1:numel(filteredComments)
     if ~isempty(regexp(filteredComments(i).str, '^-?\d+$', 'once'))
@@ -78,6 +86,8 @@ clearvars sortIdx tick_pos record
 
 %% Meat of the File
 
+fprintf('\n ===== Extracting Useful Records =====\n\n' );
+
 %For records 6,12,15 (** Need to generalize)
 % TODO: find a way to automatically locate records we care about 
 filteredComments = filteredComments(arrayfun(@(x) ismember(x.record,[6,12,15]), filteredComments));
@@ -87,6 +97,7 @@ window_size = 100;
 R1_delay = 130;
 R2_delay = window_size + R1_delay;
 
+fprintf('\n ===== Finding Peak to Peak =====\n\n' );
 
 % For each comment:
 for i = 1:numel(filteredComments)
@@ -117,6 +128,9 @@ clearvars R1_delay R2_delay windowsr2 windowsr1 maxminr2 maxminr1 x i window_siz
 %   and stimulation
 
 % Output 
+
+fprintf('\n ===== Calculating Peak to Peak related data =====\n\n' );
+
 lastamp = 1;
 
 
@@ -146,6 +160,8 @@ clearvars lastamp
 
 %% Data cleaning
 
+fprintf('\n ===== Calculation complete, preparing output =====\n\n' );
+
 
 % DONE: Clean up output, s.t. it only contains info we need 
 
@@ -173,6 +189,11 @@ clearvars x i maxminr1 j
 
 %% Exporting to Excel 
 
+exportnames = ['Output/outputr1.csv, ' ' Output/outputr2.csv'];
+
+fprintf(['\n ===== exporting as ' exportnames ' =====\n\n'] );
+
+
 %Convert to table to csv & export
 outr1 = struct2table(newstructr1);
 writetable(outr1, "Output/outputr1.csv");
@@ -180,11 +201,18 @@ writetable(outr1, "Output/outputr1.csv");
 outr2 = struct2table(newstructr2);
 writetable(outr2, "Output/outputr2.csv");
 
+fprintf('\n Done! \n\n')
+
 %% R2/R1 ratio
+fprintf('\n ===== detected R2/R1 ratio boolean, calculating... ===== \n\n' );
+
 outratio = outr2; % Initialize the new table with outr1's structure
 outratio{:, 2:9} = outr2{:, 2:9} ./ outr1{:, 2:9}; % Element-wise division
 
-writetable(outratio, "Output/outputr2r1ratio.csv");
+outrationame = 'Output/outputr2r1ratio.csv';
+writetable(outratio, outrationame);
+fprintf(['\n ===== R2R1 ratio output to ' outrationame ' ===== \n\n'] );
+
 %% Plotting
 
 %incorporate plotting in the next draft. 
