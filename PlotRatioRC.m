@@ -84,7 +84,7 @@ function confirmation = PlotRatioRC(data, data_range, repetition, bool_normalize
         grid on;
         hold off;
         
-        saveas(gcf, "Output/r2r1plot" + r + str_normalize + str_global + ".png");
+        saveas(gcf, "Output/r2r1plot alt" + r + str_normalize + str_global + ".png");
         clf; 
     end
 

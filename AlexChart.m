@@ -1,4 +1,4 @@
-function newfilepath = AlexChart(path)
+function newfilepath = AlexChart(path1)
     %Alternatively, output the 5 data structs that I need to use
 
     % ADI Convert creates a file that is just awful. Each channel gets its own
@@ -42,7 +42,7 @@ function newfilepath = AlexChart(path)
     
     % This is an awesome utility, that has a horrible output...
     % TODO: make sure this readas from Input 
-    path_ext = [path,'.adicht'];
+    path_ext = [path1,'.adicht'];
     adi.convert(path_ext); 
     
     fprintf('\n Done...\n\n');
@@ -143,7 +143,7 @@ function newfilepath = AlexChart(path)
     
     % FINAL STEP - SAVE DATA!!!
     % TODO: change save name s.t. it gets saved in Input folder
-    newfilepath = [path, '.mat'];
+    newfilepath = [path1, '.mat'];
     save(newfilepath,'Labchart')
     % save([savedir,savename '.set'],'EEG')
     

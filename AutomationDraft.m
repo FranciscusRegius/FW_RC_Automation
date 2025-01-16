@@ -1,3 +1,4 @@
+% function AutomationDraft(file_name)
 % Automation Draft
 % labchart = adi.readFile("C:\Users\fengy\Desktop\HM\Dr Sayenko Lab\20240826_RTA006_EPA1_RC ONLY.adicht");
 
@@ -7,11 +8,16 @@
 %% List of parameters 
 
 % window_size: a numbers in ms - the size of the window, after each stimulation, wherein we look for the peak to peak
+%   % TODO: add an option to manually adjust window_size 
 % Delay: number in ms, the delay between admitted stimulation and the beginning of the sampling window
 % bool_normalize: boolean whether or not to normalize the data, default true for now
 bool_normalize = 1; 
-file_name = '20240826_RTA006_EPA1_RC ONLY';
+% if nargin < 1
+    file_name = '20240826_RTA006_EPA1_RC ONLY'; % Add a function that 
+% end
 path = [cd, '\Input\', file_name];
+% Channels_to_use: allows choice of whcih channels to process; default to
+% all channels other than 1&2
 
 fprintf(['\n ===== Opening file ' file_name ' with Alex Chart =====\n\n'] );
 
@@ -211,7 +217,7 @@ fprintf('\n Done! \n\n')
 fprintf('\n ===== detected R2/R1 ratio boolean, calculating... ===== \n\n' );
 
 outratio = outr2; % Initialize the new table with outr1's structure
-outratio{:, 2:9} = outr2{:, 2:9} ./ outr1{:, 2:9}; % Element-wise division
+outratio{:, 2:9} = outr1{:, 2:9} ./ outr2{:, 2:9}; % Element-wise division
 
 outrationame = 'Output/outputr2r1ratio.csv';
 writetable(outratio, outrationame);
@@ -220,7 +226,7 @@ fprintf(['\n ===== R2R1 ratio output to ' outrationame ' ===== \n\n'] );
 %% Plotting
 
 %incorporate plotting in the next draft. 
-PlotRC(outr1, 9, 3, 1,0);
+PlotRC(outr1, 9, 3, 1,1);
 
 % Plot each channel separately (for channel in list of channels plot
 % plot(amplitude, channel data) --> this way, channel data (in intensity)
@@ -232,3 +238,4 @@ PlotRatioRC(outratio,9,3,0,0);
 
 
 %% Drafting Ground
+% end
