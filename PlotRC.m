@@ -6,6 +6,8 @@ function confirmation = PlotRC(data, data_range, repetition, bool_normalize,bool
     % repetition: integer, how many times should I plot the data_range of
     %amplitudes, since I put the amplitudes across 3 trials in the same
     %struct
+    % TODO: repeace range & repetition with something less convoluted 
+
     % bool_normalize: whether or not to normalize, data to the largest response of the muscle across stimulation locations -->  i.e., the global maximum across all stimulation locations of RRF would be 1 and the global minimum would be 0, everything else would be scaled accordingly.
 
      %DEbug, bool_global_normalization: normalize all data together --> the shape of the plot should look the same as unnormalized 
@@ -14,24 +16,25 @@ function confirmation = PlotRC(data, data_range, repetition, bool_normalize,bool
      % in less stimulated muscles are exaggerrated
 
      str_normalize = "";
-     str_global = "";     
+     str_global = "";   
+     data_width = width(data);
 
      %Global normalization
      if bool_normalize 
          str_normalize = "normalized";
          if bool_global_normalization
              str_global = "globally";
-             to_normalize = data{:, 2:9};
+             to_normalize = data{:, 2:data_width};
             
             % Normalize across all columns as a single unit (min-max normalization)
             normalizedData = (to_normalize - min(to_normalize, [], 'all')) / (max(to_normalize, [], 'all') - min(to_normalize, [], 'all'));
             
             % Assign normalized values back to the table
-            data{:, 2:9} = normalizedData;
+            data{:, 2:data_width} = normalizedData;
 
          else 
             str_global = "permuscle";
-            data{:,2:9} = normalize(data{:, 2:9}, 'range'); %TODO: parameterize the number of columns
+            data{:,2:data_width} = normalize(data{:, 2:data_width}, 'range'); %TODO: parameterize the number of columns
          end
 
         % for col = 2:9
@@ -49,7 +52,7 @@ function confirmation = PlotRC(data, data_range, repetition, bool_normalize,bool
 
 
         curr_range = (1:data_range) + data_range * (r-1) ;
-        x = data.str(curr_range);
+        x = data{curr_range,1};
         
         
         tab10 = [
@@ -69,10 +72,10 @@ function confirmation = PlotRC(data, data_range, repetition, bool_normalize,bool
             % channel = outr1.("EMG_Chn_" + i + "_r1")
             % plot(x, channel, ....)   
         
-        for i = 1:8 % TODO: change this st. it just goes through each column one by one
-            channel = data.("EMG_Chn_" + i + "_r1"); %TODO: change this so that it just loops through each column
-            channel = channel(curr_range);
-            plot(x, channel, "DisplayName","EMG Chn " + i + " r1"); % TODO: change dispalyname to be the column name
+        for i = 2:data_width % TODO: change this st. it just goes through each column one by one
+            channel = data{curr_range,i}; %TODO: change this so that it just loops through each column
+            % channel = channel(curr_range);
+            plot(x, channel, "DisplayName",data.Properties.VariableNames{i}); % DONE: change dispalyname to be the column name
         end
         % As such, the data structure must treat each channel as a separate object
         

@@ -16,8 +16,9 @@ bool_normalize = 1;
     file_name = '20240826_RTA006_EPA1_RC ONLY'; % Add a function that 
 % end
 path = [cd, '\Input\', file_name];
-% Channels_to_use: allows choice of whcih channels to process; default to
+% channels_to_use: allows choice of whcih channels to process; default to
 % all channels other than 1&2
+channels_to_use = 3:10;
 
 fprintf(['\n ===== Opening file ' file_name ' with Alex Chart =====\n\n'] );
 
@@ -115,7 +116,7 @@ for i = 1:numel(filteredComments)
         x = filteredComments(i);
 %For each stimulation under the amplitude
 %   Find in data{record}, the max - min in the area tick+130 to tick+230
-        % TODO: parameterize 3:10, which stands for the channels
+        % DONE: parameterize 3:10, which stands for the channels
         windowsr1 = Data{x.record}(3:10, x.tick_position+R1_delay:x.tick_position+R2_delay);
         maxminr1 = max(windowsr1, [],2) - min(windowsr1,[],2);
 
@@ -166,6 +167,13 @@ end
 %filter array to only have amplitude left
 %TODO, change the name output here 
 output = filteredComments(arrayfun(@(x) isnumeric(x.str), filteredComments));
+
+%Sanity check
+% if len(output.averager1) == len(channels_to_use)
+
+% else fprintf('\n ERROR! Mismatch between channels \n\n')
+
+% end
 clearvars lastamp
 
 %% Data cleaning
@@ -176,8 +184,11 @@ fprintf('\n ===== Calculation complete, preparing output =====\n\n' );
 % DONE: Clean up output, s.t. it only contains info we need 
 
 %Calculate average  & store into new struct 
-newstructr1 = struct( 'str', {output.str});
-newstructr2 = struct( 'str', {output.str});
+channel_names = string({channel_meta(3:10).name});
+
+
+newstructr1 = struct( 'amps', {output.str});
+newstructr2 = struct( 'amps', {output.str});
 
 
 for i = 1:numel(output)
@@ -190,8 +201,8 @@ for i = 1:numel(output)
 
         % TODO: add checks to include other information
 
-        newstructr1(i).("EMG_Chn_" + int2str(j) + "_r1") = output(i).averager1(j);
-        newstructr2(i).("EMG_Chn_" + int2str(j) + "_r2") = output(i).averager2(j);
+        newstructr1(i).(channel_names(j)) = output(i).averager1(j);
+        newstructr2(i).(channel_names(j)) = output(i).averager2(j);
     end
 end 
 
