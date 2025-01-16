@@ -228,7 +228,7 @@ fprintf('\n Done! \n\n')
 fprintf('\n ===== detected R2/R1 ratio boolean, calculating... ===== \n\n' );
 
 outratio = outr2; % Initialize the new table with outr1's structure
-outratio{:, 2:9} = outr1{:, 2:9} ./ outr2{:, 2:9}; % Element-wise division
+outratio{:, 2:9} = outr2{:, 2:9} ./ outr1{:, 2:9}; % Element-wise division
 
 outrationame = 'Output/outputr2r1ratio.csv';
 writetable(outratio, outrationame);

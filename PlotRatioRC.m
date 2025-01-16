@@ -14,25 +14,28 @@ function confirmation = PlotRatioRC(data, data_range, repetition, bool_normalize
      % in less stimulated muscles are exaggerrated
 
      str_normalize = "";
-     str_global = "";     
+     str_global = "";
+     data_width = width(data);
+     
 
      %Global normalization
      if bool_normalize 
          str_normalize = "normalized";
          if bool_global_normalization
              str_global = "globally";
-             to_normalize = data{:, 2:9};
+             to_normalize = data{:, 2:data_width};
             
             % Normalize across all columns as a single unit (min-max normalization)
             normalizedData = (to_normalize - min(to_normalize, [], 'all')) / (max(to_normalize, [], 'all') - min(to_normalize, [], 'all'));
             
             % Assign normalized values back to the table
-            data{:, 2:9} = normalizedData;
+            data{:, 2:data_width} = normalizedData;
+            
 
          else 
             str_global = "permuscle";
-            data{:,2:9} = normalize(data{:, 2:9}, 'range'); %TODO: parameterize the number of columns
-         end
+            data{:,2:data_width} = normalize(data{:, 2:data_width}, 'range');
+        end
 
         % for col = 2:9
         %     outr3{:, col} = normalize(outr3{:, col}, 'range'); % Min-max normalization for each column
@@ -49,7 +52,7 @@ function confirmation = PlotRatioRC(data, data_range, repetition, bool_normalize
 
 
         curr_range = (1:data_range) + data_range * (r-1) ;
-        x = data.str(curr_range);
+        x = data{curr_range,1};
         
         
         tab10 = [
@@ -65,14 +68,11 @@ function confirmation = PlotRatioRC(data, data_range, repetition, bool_normalize
             0.1216, 0.4667, 0.7059;  % Blue
         ];
         
-        %Then, for each of the rest of the str columns/for each "EMG_chn_" + i + "r1"
-            % channel = outr1.("EMG_Chn_" + i + "_r1")
-            % plot(x, channel, ....)   
-        
-        for i = 1:8 % TODO: change this st. it just goes through each column one by one
-            channel = data.("EMG_Chn_" + i + "_r2"); %TODO: change this so that it just loops through each column
-            channel = channel(curr_range); % TODO: make sure to take each column name instead of naming them
-            plot(x, channel, "DisplayName","EMG Chn " + i + "ratio"); % TODO: change dispalyname to be the column name
+
+        for i = 2:data_width % TODO: change this st. it just goes through each column one by one
+            channel = data{curr_range,i}; %TODO: change this so that it just loops through each column
+            % channel = channel(curr_range);
+            plot(x, channel, "DisplayName",data.Properties.VariableNames{i}); % DONE: change dispalyname to be the column name
         end
         % As such, the data structure must treat each channel as a separate object
         
@@ -84,7 +84,7 @@ function confirmation = PlotRatioRC(data, data_range, repetition, bool_normalize
         grid on;
         hold off;
         
-        saveas(gcf, "Output/r2r1plot alt" + r + str_normalize + str_global + ".png");
+        saveas(gcf, "Output/r2r1plot" + r + str_normalize + str_global + ".png");
         clf; 
     end
 

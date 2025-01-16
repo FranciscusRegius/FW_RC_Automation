@@ -1,4 +1,4 @@
-function confirmation = PlotRC(data, data_range, repetition, bool_normalize,bool_global_normalization)
+function confirmation = PlotRC(data, data_range, repetition, bool_normalize,bool_permuscle)
     
     % data: the struct input, should consists of columns str and emg chns
     % data_range: integer, how many rows should be plotted in one plot ; represents a
@@ -21,8 +21,8 @@ function confirmation = PlotRC(data, data_range, repetition, bool_normalize,bool
 
      %Global normalization
      if bool_normalize 
-         str_normalize = "normalized";
-         if bool_global_normalization
+         str_normalize = "normalized ";
+         if ~bool_permuscle
              str_global = "globally";
              to_normalize = data{:, 2:data_width};
             
@@ -33,8 +33,8 @@ function confirmation = PlotRC(data, data_range, repetition, bool_normalize,bool
             data{:, 2:data_width} = normalizedData;
 
          else 
-            str_global = "permuscle";
-            data{:,2:data_width} = normalize(data{:, 2:data_width}, 'range'); %TODO: parameterize the number of columns
+            str_global = "per muscle";
+            data{:,2:data_width} = normalize(data{:, 2:data_width}, 'range');
          end
 
         % for col = 2:9
@@ -45,6 +45,38 @@ function confirmation = PlotRC(data, data_range, repetition, bool_normalize,bool
 
      %
 
+    if str_global == "per muscle"
+     %%Plotting per muscle 
+
+     %New plotting draft
+     %for i = 2:data_width %each column
+     %for r = 1:repetition %each of this will be a line in one graph
+
+     for i = 2:data_width %First, define the columns
+        figure;
+        hold on;
+        muscle_name = data.Properties.VariableNames{i};
+
+        for r = 1:repetition %Plot each range of data as a separate line
+            curr_range = (1:data_range) + data_range * (r-1) ;
+            x = data{curr_range,1};
+            channel = data{curr_range,i}; %TODO: change this so that it just loops through each column
+            plot(x, channel, "DisplayName","record " + r); % DONE: change dispalyname to be the column name
+        end
+        % Customize plot
+        title(str_normalize + muscle_name + " Recruitment Curve");
+        xlabel('amplitudes');
+        ylabel('Intensity, Volts');
+        legend('Location','best'); % or best outside;
+        grid on;
+        hold off;
+        
+        saveas(gcf, "Output/rcplot " + muscle_name + " " + str_normalize + str_global + ".png");
+        clf; 
+
+     end
+
+    else
      for r = 1:repetition
         %First, extract x-axis (str.values)
         figure;
@@ -68,10 +100,6 @@ function confirmation = PlotRC(data, data_range, repetition, bool_normalize,bool
             0.1216, 0.4667, 0.7059;  % Blue
         ];
         
-        %Then, for each of the rest of the str columns/for each "EMG_chn_" + i + "r1"
-            % channel = outr1.("EMG_Chn_" + i + "_r1")
-            % plot(x, channel, ....)   
-        
         for i = 2:data_width % TODO: change this st. it just goes through each column one by one
             channel = data{curr_range,i}; %TODO: change this so that it just loops through each column
             % channel = channel(curr_range);
@@ -80,7 +108,7 @@ function confirmation = PlotRC(data, data_range, repetition, bool_normalize,bool
         % As such, the data structure must treat each channel as a separate object
         
         % Customize plot
-        title("Recruitment Curve" + r);
+        title(str_normalized + "Recruitment Curve" + r);
         xlabel('amplitudes');
         ylabel('Intensity - Volts');
         legend('Location','best'); % or best outside;
@@ -89,10 +117,12 @@ function confirmation = PlotRC(data, data_range, repetition, bool_normalize,bool
         
         saveas(gcf, "Output/plot" + r + str_normalize + str_global + ".png");
         clf; 
-    end
+     end
 
+    end
     confirmation = 1;
 end
+
 
 
 %%%%List of parameters
