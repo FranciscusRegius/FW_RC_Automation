@@ -13,12 +13,16 @@
 % bool_normalize: boolean whether or not to normalize the data, default true for now
 bool_normalize = 1; 
 % if nargin < 1
-    file_name = '20240826_RTA006_EPA1_RC ONLY'; % Add a function that 
+    file_name = '20240408_RTA002_EPA3_RC ONLY TSS'; % Add a function that 
 % end
 path = [cd, '\Input\', file_name];
 % channels_to_use: allows choice of whcih channels to process; default to
 % all channels other than 1&2
 channels_to_use = 3:10;
+window_size = 100;
+R1_delay = 130;
+R2_delay = window_size + R1_delay;
+
 
 fprintf(['\n ===== Opening file ' file_name ' with Alex Chart =====\n\n'] );
 
@@ -47,12 +51,15 @@ newfilepath = AlexChart(path); % This should load everything into workspace
 
 load(newfilepath); % DONE: replace this, eventually, with AlexChart 
 
+%% Extract Labchart Fields
 % TODO: Decicde whether to have the data directly output by AlexChart function or save & load 
 Data = Labchart.Data          ;
 file_meta =Labchart.file_meta     ;
 comments =Labchart.comments      ;
 record_meta =Labchart.record_meta   ;
 channel_meta = Labchart.channel_meta  ;
+
+fprintf('\n ===== New file loading completed =====\n\n' );
 
 clearvars Labchart
 
@@ -103,10 +110,6 @@ fprintf('\n ===== Extracting Useful Records =====\n\n' );
 % TODO: find a way to automatically locate records we care about 
 filteredComments = filteredComments(arrayfun(@(x) ismember(x.record,[6,12,15]), filteredComments));
 
-
-window_size = 100;
-R1_delay = 130;
-R2_delay = window_size + R1_delay;
 
 fprintf('\n ===== Finding Peak to Peak =====\n\n' );
 
