@@ -190,7 +190,7 @@ fprintf('\n ===== Relevant Data Calculated =====\n\n' );
 
 clearvars lastamp
 
-%% Output Formatting
+%% Data cleaning
 
 fprintf('\n ===== Preparing Output =====\n\n' );
 
@@ -201,38 +201,32 @@ fprintf('\n ===== Preparing Output =====\n\n' );
 channel_names = string({channel_meta(3:10).name});
 
 
-% new struct should be a superstruct with each record as one substruct
 % Assume each amp value has the "record_name" field 
+record_names = string(unique({output.record_name}));
 
-record_names = unique({output.record_name});
 
-newstructr1 = dictionary();
-newstructr2 = dictionary();
 
-for name_idx = 1:length(record_names)
-    newstructr1(record_names{name_idx}) = struct();
-    newstructr2(record_names{name_idx}) = struct();
-end
-%% old output formatting
-% newstructr1 = struct( 'amps', {output.str});
-% newstructr2 = struct( 'amps', {output.str});    
-% 
 
-for name_idx = 1:length(record_names)
-    structr1 = newstructr1(record_names{name_idx});
-    structr2 = newstructr2(record_names{name_idx});
-  for i = 1:numel(output)
+%% Old Data Cleaning
+newstructr1 = struct( 'amps', {output.str});
+newstructr2 = struct( 'amps', {output.str});
+
+
+for i = 1:numel(output)
     output(i).averager1 = output(i).sumr1 / output(i).count;
     output(i).averager2 = output(i).sumr2 / output(i).count;
-
-    structr1()
+    newstructr1(i).("record_name") = output(i).record_name;
+    newstructr2(i).("record_name") = output(i).record_name;
 
     for j = 1:numel(output(i).averager1)
         %store into new struct 
-        structr1(i).(channel_names(j)) = output(i).averager1(j);
-        structr2(i).(channel_names(j)) = output(i).averager2(j);
+        % TODO: add parameters that indicate which fields are needed
+
+        % TODO: add checks to include other information
+
+        newstructr1(i).(channel_names(j)) = output(i).averager1(j);
+        newstructr2(i).(channel_names(j)) = output(i).averager2(j);
     end
-  end
 end 
 
 clearvars x i maxminr1 j 
@@ -266,20 +260,18 @@ fprintf(['\n ===== R2R1 ratio output to ' outrationame ' ===== \n\n'] );
 %% Plotting
 
 %incorporate plotting in the next draft. 
-PlotRC(outr1, 9, 3, 1,1);
+PlotRC(outr1, record_names, 1,1);
+%TODO: render the data range variable obsolete
 
 % Plot each channel separately (for channel in list of channels plot
 % plot(amplitude, channel data) --> this way, channel data (in intensity)
 % will be plotted with each channel representing a different line
-% TODO: make this more intuitive... see other file. 
 
-%% Plot R2R1
-PlotRatioRC(outratio,9,3,0,0);
+% %% Plot R2R1
+% PlotRatioRC(outratio,9,3,0,0);
+% TODO: Incorporate ratio plot into normal RC plot, instead just plotting
+% the outratio file 
 
 
 %% Drafting Ground
-for i = record_names
-    fprintf(i)
-end
-
 % end

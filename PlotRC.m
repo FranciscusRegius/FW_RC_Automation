@@ -1,8 +1,6 @@
-function confirmation = PlotRC(data, data_range, repetition, bool_normalize,bool_permuscle)
+function confirmation = PlotRC(data, record_names, bool_normalize,bool_permuscle)
     
     % data: the struct input, should consists of columns str and emg chns
-    % data_range: integer, how many rows should be plotted in one plot ; represents a
-    %series of amplitudes
     % repetition: integer, how many times should I plot the data_range of
     %amplitudes, since I put the amplitudes across 3 trials in the same
     %struct
@@ -24,17 +22,17 @@ function confirmation = PlotRC(data, data_range, repetition, bool_normalize,bool
          str_normalize = "normalized ";
          if ~bool_permuscle
              str_global = "globally";
-             to_normalize = data{:, 2:data_width};
+             to_normalize = data{:, 3:data_width};
             
             % Normalize across all columns as a single unit (min-max normalization)
             normalizedData = (to_normalize - min(to_normalize, [], 'all')) / (max(to_normalize, [], 'all') - min(to_normalize, [], 'all'));
             
             % Assign normalized values back to the table
-            data{:, 2:data_width} = normalizedData;
+            data{:, 3:data_width} = normalizedData;
 
          else 
             str_global = "per muscle";
-            data{:,2:data_width} = normalize(data{:, 2:data_width}, 'range');
+            data{:,3:data_width} = normalize(data{:, 3:data_width}, 'range');
          end
 
         % for col = 2:9
@@ -49,19 +47,20 @@ function confirmation = PlotRC(data, data_range, repetition, bool_normalize,bool
      %%Plotting per muscle 
 
      %New plotting draft
-     %for i = 2:data_width %each column
+     %for i = 3:data_width %each column
      %for r = 1:repetition %each of this will be a line in one graph
 
-     for i = 2:data_width %First, define the columns
+     for i = 3:data_width %First, define the columns
         figure;
         hold on;
         muscle_name = data.Properties.VariableNames{i};
 
-        for r = 1:repetition %Plot each range of data as a separate line
+        for r = 1:length(record_names) %Plot each range of data as a separate line
+            data_range = sum(strcmp(data.record_name, record_names(r)));
             curr_range = (1:data_range) + data_range * (r-1) ;
             x = data{curr_range,1};
             channel = data{curr_range,i}; %TODO: change this so that it just loops through each column
-            plot(x, channel, "DisplayName","record " + r); % DONE: change dispalyname to be the column name
+            plot(x, channel, "DisplayName", record_names(r)); % DONE: change dispalyname to be the column name
         end
         % Customize plot
         title(muscle_name);
@@ -81,12 +80,12 @@ function confirmation = PlotRC(data, data_range, repetition, bool_normalize,bool
      end
 
     else
-     for r = 1:repetition
+     for r = 1:length(record_names)
         %First, extract x-axis (str.values)
         figure;
         hold on;
 
-
+        data_range = sum(strcmp(data.record_name, record_names(r)));
         curr_range = (1:data_range) + data_range * (r-1) ;
         x = data{curr_range,1};
         
@@ -104,7 +103,7 @@ function confirmation = PlotRC(data, data_range, repetition, bool_normalize,bool
             0.1216, 0.4667, 0.7059;  % Blue
         ];
         
-        for i = 2:data_width % TODO: change this st. it just goes through each column one by one
+        for i = 3:data_width % TODO: change this st. it just goes through each column one by one
             channel = data{curr_range,i}; %TODO: change this so that it just loops through each column
             % channel = channel(curr_range);
             plot(x, channel, "DisplayName",data.Properties.VariableNames{i}); % DONE: change dispalyname to be the column name
@@ -112,7 +111,7 @@ function confirmation = PlotRC(data, data_range, repetition, bool_normalize,bool
         % As such, the data structure must treat each channel as a separate object
         
         % Customize plot
-        title(str_normalized + "Recruitment Curve" + r);
+        title(str_normalized + "Recruitment Curve" + record_names(r));
         xlabel('amplitudes');
         if bool_normalize 
             ylabel('Normalized Intensity');
@@ -123,7 +122,7 @@ function confirmation = PlotRC(data, data_range, repetition, bool_normalize,bool
         grid on;
         hold off;
         
-        saveas(gcf, "Output/plot" + r + str_normalize + str_global + ".png");
+        saveas(gcf, "Output/plot" + record_names(r) + str_normalize + str_global + ".png");
         clf; 
      end
 

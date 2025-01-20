@@ -215,22 +215,24 @@ for name_idx = 1:length(record_names)
 end
 %% old output formatting
 % newstructr1 = struct( 'amps', {output.str});
-% newstructr2 = struct( 'amps', {output.str});
+% newstructr2 = struct( 'amps', {output.str});    
+% 
 
-for i = 1:numel(output)
+for name_idx = 1:length(record_names)
+    structr1 = newstructr1(record_names{name_idx});
+    structr2 = newstructr2(record_names{name_idx});
+  for i = 1:numel(output)
     output(i).averager1 = output(i).sumr1 / output(i).count;
     output(i).averager2 = output(i).sumr2 / output(i).count;
-    
-        for j = 1:numel(output(i).averager1)
-            %store into new struct 
-            structr1 = newstructr1(record_names{name_idx});
-            structr2 = newstructr1(record_names{name_idx});
 
-            structr1(i).(channel_names(j)) = output(i).averager1(j);
-            structr2(i).(channel_names(j)) = output(i).averager2(j);
-        end
+    structr1()
+
+    for j = 1:numel(output(i).averager1)
+        %store into new struct 
+        structr1(i).(channel_names(j)) = output(i).averager1(j);
+        structr2(i).(channel_names(j)) = output(i).averager2(j);
     end
-
+  end
 end 
 
 clearvars x i maxminr1 j 
