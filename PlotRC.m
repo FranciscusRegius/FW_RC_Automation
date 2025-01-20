@@ -64,9 +64,13 @@ function confirmation = PlotRC(data, data_range, repetition, bool_normalize,bool
             plot(x, channel, "DisplayName","record " + r); % DONE: change dispalyname to be the column name
         end
         % Customize plot
-        title(str_normalize + muscle_name + " Recruitment Curve");
+        title(muscle_name);
         xlabel('amplitudes');
-        ylabel('Intensity, Volts');
+        if bool_normalize 
+            ylabel('Normalized Intensity');
+        else 
+            ylabel('Intensity (Volts)');
+        end
         legend('Location','best'); % or best outside;
         grid on;
         hold off;
@@ -110,7 +114,11 @@ function confirmation = PlotRC(data, data_range, repetition, bool_normalize,bool
         % Customize plot
         title(str_normalized + "Recruitment Curve" + r);
         xlabel('amplitudes');
-        ylabel('Intensity - Volts');
+        if bool_normalize 
+            ylabel('Normalized Intensity');
+        else 
+            ylabel('Intensity (Volts)');
+        end
         legend('Location','best'); % or best outside;
         grid on;
         hold off;

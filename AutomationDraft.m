@@ -13,7 +13,7 @@
 % bool_normalize: boolean whether or not to normalize the data, default true for now
 bool_normalize = 1; 
 % if nargin < 1
-    file_name = '20240408_RTA002_EPA3_RC ONLY TSS'; % Add a function that 
+    file_name = '20241007 RTA003 EPA 2 RC Only francis'; % Add a function that 
 % end
 path = [cd, '\Input\', file_name];
 % channels_to_use: allows choice of whcih channels to process; default to
@@ -52,7 +52,7 @@ newfilepath = AlexChart(path); % This should load everything into workspace
 load(newfilepath); % DONE: replace this, eventually, with AlexChart 
 
 %% Extract Labchart Fields
-% TODO: Decicde whether to have the data directly output by AlexChart function or save & load 
+% DONE: Saving and loading -- Decicde whether to have the data directly output by AlexChart function or save & load 
 Data = Labchart.Data          ;
 file_meta =Labchart.file_meta     ;
 comments =Labchart.comments      ;
@@ -63,9 +63,7 @@ fprintf('\n ===== New file loading completed =====\n\n' );
 
 clearvars Labchart
 
-%% Extract Data
-
-%Filter away repetitive comments
+%% Filter away repetitive comments
 % Create unique keys for all elements in comments
 fprintf('\n ===== Filtering Comments =====\n\n' );
 
@@ -84,14 +82,15 @@ clearvars keys uniqueIdx
 
 fprintf('\n ===== Formatting Data =====\n\n' );
 
-% Convert all amplitudes into double from string, idk why i dont do int
+% Convert all amplitudes into double from string
 for i = 1:numel(filteredComments)
+    %First, filter out everything in the "str" field that is not a double
     if ~isempty(regexp(filteredComments(i).str, '^-?\d+$', 'once'))
         filteredComments(i).str = str2double(filteredComments(i).str);
     end
 end
 
-%Sort data first accroding to record, thena ccording to tick_position
+%Sort data first accroding to record, then according to tick_position
 record = [filteredComments.record];
 tick_pos = [filteredComments.tick_position];
 
@@ -102,11 +101,16 @@ filteredComments = filteredComments(sortIdx);
 
 clearvars sortIdx tick_pos record
 
-%% Meat of the File
+%% Peak to peak calculation
 
 fprintf('\n ===== Extracting Useful Records =====\n\n' );
 
 %For records 6,12,15 (** Need to generalize)
+%TODO: Figure out how to determine this for other datasets
+records = [6,12,15];
+% record_names =  ;
+
+
 % TODO: find a way to automatically locate records we care about 
 filteredComments = filteredComments(arrayfun(@(x) ismember(x.record,[6,12,15]), filteredComments));
 
@@ -133,9 +137,12 @@ for i = 1:numel(filteredComments)
     end 
 end
 
+fprintf('\n ===== Raw Peak to Peak Data Calculated =====\n\n' );
+
+
 clearvars R1_delay R2_delay windowsr2 windowsr1 maxminr2 maxminr1 x i window_size
 
-%%
+%% Maxmin calculation
 
 
 %   Then, while averaging each max-min, merge elements with same record, amplitude,
@@ -155,12 +162,14 @@ for i = 1:numel(filteredComments)
         filteredComments(lastamp).sumr1 = filteredComments(lastamp).sumr1 + x.maxminr1;
         filteredComments(lastamp).sumr2 = filteredComments(lastamp).sumr2 + x.maxminr2;
         filteredComments(lastamp).count = filteredComments(lastamp).count + 1;
+        filteredComments(lastamp).record_name = x.str;
 
     elseif isnumeric(x.str)
         lastamp = i;
         filteredComments(lastamp).sumr1 = 0;
         filteredComments(lastamp).sumr2 = 0;
         filteredComments(lastamp).count = 0;
+        filteredComments(lastamp).record_name = '';
        
     end 
 end
@@ -177,36 +186,53 @@ output = filteredComments(arrayfun(@(x) isnumeric(x.str), filteredComments));
 % else fprintf('\n ERROR! Mismatch between channels \n\n')
 
 % end
+fprintf('\n ===== Relevant Data Calculated =====\n\n' );
+
 clearvars lastamp
 
-%% Data cleaning
+%% Output Formatting
 
-fprintf('\n ===== Calculation complete, preparing output =====\n\n' );
+fprintf('\n ===== Preparing Output =====\n\n' );
 
 
 % DONE: Clean up output, s.t. it only contains info we need 
 
-%Calculate average  & store into new struct 
+%Calculate average & store into new struct 
 channel_names = string({channel_meta(3:10).name});
 
 
-newstructr1 = struct( 'amps', {output.str});
-newstructr2 = struct( 'amps', {output.str});
+% new struct should be a superstruct with each record as one substruct
+% Assume each amp value has the "record_name" field 
 
+record_names = unique({output.record_name});
 
-for i = 1:numel(output)
+newstructr1 = dictionary();
+newstructr2 = dictionary();
+
+for name_idx = 1:length(record_names)
+    newstructr1(record_names{name_idx}) = struct();
+    newstructr2(record_names{name_idx}) = struct();
+end
+%% old output formatting
+% newstructr1 = struct( 'amps', {output.str});
+% newstructr2 = struct( 'amps', {output.str});    
+% 
+
+for name_idx = 1:length(record_names)
+    structr1 = newstructr1(record_names{name_idx});
+    structr2 = newstructr2(record_names{name_idx});
+  for i = 1:numel(output)
     output(i).averager1 = output(i).sumr1 / output(i).count;
     output(i).averager2 = output(i).sumr2 / output(i).count;
 
+    structr1()
+
     for j = 1:numel(output(i).averager1)
         %store into new struct 
-        % TODO: add parameters that indicate which fields are needed
-
-        % TODO: add checks to include other information
-
-        newstructr1(i).(channel_names(j)) = output(i).averager1(j);
-        newstructr2(i).(channel_names(j)) = output(i).averager2(j);
+        structr1(i).(channel_names(j)) = output(i).averager1(j);
+        structr2(i).(channel_names(j)) = output(i).averager2(j);
     end
+  end
 end 
 
 clearvars x i maxminr1 j 
@@ -252,4 +278,8 @@ PlotRatioRC(outratio,9,3,0,0);
 
 
 %% Drafting Ground
+for i = record_names
+    fprintf(i)
+end
+
 % end
