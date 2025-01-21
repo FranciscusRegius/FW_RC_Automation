@@ -21,10 +21,8 @@ function confirmation = PlotRC(data, record_names, bool_normalize,bool_permuscle
      str_normalize = "";
      str_global = "";   
      if bool_ratio
-         str_ratio = "r2r1";
-     else
          str_ratio = "";
-     end 
+     else
      data_width = width(data);
 
 %%  Determining Normalization
@@ -60,6 +58,11 @@ else
     y_label = "Intensity (Volts)";
 end 
 
+
+
+plot_title = ;
+plot_save_prefix = ;
+
 %% Different Types of Plotting
     if str_global == "per muscle"
      %%Plotting per muscle 
@@ -81,14 +84,15 @@ end
             plot(x, channel, "DisplayName", record_names(r)); % DONE: change dispalyname to be the column name
         end
         % Customize plot
-        title(str_ratio + muscle_name);
+        title(muscle_name);
         xlabel('amplitudes');
         ylabel(y_label);
+        end
         legend('Location','best'); % or best outside;
         grid on;
         hold off;
         
-        saveas(gcf, "Output/rcplot " + str_ratio + muscle_name + " " + str_normalize + str_global + ".png");
+        saveas(gcf, "Output/rcplot " + muscle_name + " " + str_normalize + str_global + ".png");
         clf; 
 
      end
@@ -125,14 +129,14 @@ end
         % As such, the data structure must treat each channel as a separate object
         
         % Customize plot
-        title(str_normalize + str_ratio + record_names(r) );
+        title(str_normalized + record_names(r) + str_ratio);
         xlabel('amplitudes');
         ylabel(y_label);
         legend('Location','best'); % or best outside;
         grid on;
         hold off;
         
-        saveas(gcf, "Output/rcplot" + r  + str_ratio + str_normalize+ str_global + ".png");
+        saveas(gcf, "Output/rcplot" + record_names(r) + str_normalize + str_global + ".png");
         clf; 
      end
 

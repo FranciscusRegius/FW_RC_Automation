@@ -251,7 +251,7 @@ fprintf('\n Done! \n\n')
 fprintf('\n ===== detected R2/R1 ratio boolean, calculating... ===== \n\n' );
 
 outratio = outr2; % Initialize the new table with outr1's structure
-outratio{:, 2:9} = outr2{:, 2:9} ./ outr1{:, 2:9}; % Element-wise division
+outratio{:, 3:10} = outr2{:, 3:10} ./ outr1{:, 3:10}; % Element-wise division
 
 outrationame = 'Output/outputr2r1ratio.csv';
 writetable(outratio, outrationame);
@@ -260,16 +260,16 @@ fprintf(['\n ===== R2R1 ratio output to ' outrationame ' ===== \n\n'] );
 %% Plotting
 
 %incorporate plotting in the next draft. 
-PlotRC(outr1, record_names, 1,1);
+PlotRC(outr1, record_names,1,0,0);
 %TODO: render the data range variable obsolete
 
 % Plot each channel separately (for channel in list of channels plot
 % plot(amplitude, channel data) --> this way, channel data (in intensity)
 % will be plotted with each channel representing a different line
 
-% %% Plot R2R1
-% PlotRatioRC(outratio,9,3,0,0);
-% TODO: Incorporate ratio plot into normal RC plot, instead just plotting
+%% Plot R2R1
+PlotRC(outratio, record_names,1,1,1);
+% DONE: Incorporate ratio plot into normal RC plot, instead just plotting
 % the outratio file 
 
 
