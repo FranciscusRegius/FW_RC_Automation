@@ -51,6 +51,7 @@ newfilepath = AlexChart(path); % This should load everything into workspace
 
 load(newfilepath); % DONE: replace this, eventually, with AlexChart 
 
+
 %% Extract Labchart Fields
 % DONE: Saving and loading -- Decicde whether to have the data directly output by AlexChart function or save & load 
 Data = Labchart.Data          ;
@@ -62,6 +63,59 @@ channel_meta = Labchart.channel_meta  ;
 fprintf('\n ===== New file loading completed =====\n\n' );
 
 clearvars Labchart
+
+
+%% Stimulation Location Determination
+% DONE
+% 1. identify the peaks in channel 2
+    % This is done by normalizing channel 2 to be 0 to 1, every spot
+    % greater than .8 is going to be a stimulation
+    % associate the amplitude comment to the nearest 2 stimulations 
+    % Alternatively, assuming that channel 2 format is standard, we can
+    % forgo normalizing and just find spots greater than 1
+% 3. notate each stimulation in the comments section  
+
+% determine the records we care about, to reduce running time 
+relevant_records = unique([comments.record]);
+
+% Go through each relevant record and determine all the stimulations by
+% looking at channel 2
+% Then add each of the stimulations to comments
+for idx = 1:length(relevant_records)
+    i = relevant_records(idx);
+
+    % extract channel 2 in the given record
+    chnl2 = Data{1,i}(2,:); % ith column of the Data cell, everything in row 2
+
+    % find the indices of stimulations as a list (i.e. tick position) 
+    indices = find(chnl2 > 2); 
+    if width(indices) == 0
+        continue
+    end
+
+    %Remove repetitive stimulations
+    diffs = diff(indices);
+    boundaries = [1 , find(diffs>3) + 1];
+    filtered_indices = indices(boundaries);
+    
+    % for loop add them as str = 'stim', tick_position = index, record = i
+    len = length(comments);
+    for j = 1:length(filtered_indices)
+        %index = filtered_indices(j)
+        len = len + 1;
+        comments(len).str = 'stim';
+        comments(len).tick_position = filtered_indices(j);
+        comments(len).record = i;
+    end
+end
+
+
+clearvars filtered_indices indices diffs boundaries i idx j 
+
+%% Record autodetermination
+% TODO
+% Determine which records to use automatically, based on record size 
+
 
 %% Filter away repetitive comments
 % Create unique keys for all elements in comments
@@ -101,15 +155,18 @@ filteredComments = filteredComments(sortIdx);
 
 clearvars sortIdx tick_pos record
 
+
 %% Peak to peak calculation
 
 fprintf('\n ===== Extracting Useful Records =====\n\n' );
 
 %For records 6,12,15 (** Need to generalize)
 %TODO: Figure out how to determine this for other datasets
+% PLAN: identify the most prominent records (statistically) and set those
+% as records
 records = [6,12,15];
 % record_names =  ;
-
+% TODO: add a pritn statement to show which records are chosen 
 
 % TODO: find a way to automatically locate records we care about 
 filteredComments = filteredComments(arrayfun(@(x) ismember(x.record,[6,12,15]), filteredComments));

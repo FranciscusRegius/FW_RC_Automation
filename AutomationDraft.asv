@@ -51,6 +51,7 @@ newfilepath = AlexChart(path); % This should load everything into workspace
 
 load(newfilepath); % DONE: replace this, eventually, with AlexChart 
 
+
 %% Extract Labchart Fields
 % DONE: Saving and loading -- Decicde whether to have the data directly output by AlexChart function or save & load 
 Data = Labchart.Data          ;
@@ -62,6 +63,61 @@ channel_meta = Labchart.channel_meta  ;
 fprintf('\n ===== New file loading completed =====\n\n' );
 
 clearvars Labchart
+
+
+%% Stimulation Location Determination
+% DONE
+% 1. identify the peaks in channel 2
+    % This is done by normalizing channel 2 to be 0 to 1, every spot
+    % greater than .8 is going to be a stimulation
+    % associate the amplitude comment to the nearest 2 stimulations 
+    % Alternatively, assuming that channel 2 format is standard, we can
+    % forgo normalizing and just find spots greater than 1
+% 3. notate each stimulation in the comments section  
+
+%% SLD Part 1
+
+% determine the records we care about, to reduce running time 
+relevant_records = unique([comments.record]);
+
+% Go through each relevant record and determine all the stimulations by
+% looking at channel 2
+% Then add each of the stimulations to comments
+for idx = 1:length(relevant_records)
+    i = relevant_records(idx);
+
+    % extract channel 2 in the given record
+    chnl2 = Data{1,i}(2,:); % ith column of the Data cell, everything in row 2
+
+    % find the indices of stimulations as a list (i.e. tick position) 
+    indices = find(chnl2 > 2); 
+    if width(indices) == 0
+        continue
+    end
+
+    %Remove repetitive stimulations
+    diffs = diff(indices);
+    boundaries = [1 , find(diffs>3) + 1];
+    filtered_indices = indices(boundaries);
+    
+    % for loop add them as str = 'stim', tick_position = index, record = i
+    len = length(comments);
+    for j = 1:length(filtered_indices)
+        %index = filtered_indices(j)
+        len = len + 1;
+        comments(len).str = 'stim';
+        comments(len).tick_position = filtered_indices(j);
+        comments(len).record = i;
+    end
+end
+
+
+clearvars filtered_indices indices diffs boundaries i idx j 
+
+%% Record autodetermination
+% TODO
+% Determine which records to use automatically, based on record size 
+
 
 %% Filter away repetitive comments
 % Create unique keys for all elements in comments
@@ -101,15 +157,18 @@ filteredComments = filteredComments(sortIdx);
 
 clearvars sortIdx tick_pos record
 
+
 %% Peak to peak calculation
 
 fprintf('\n ===== Extracting Useful Records =====\n\n' );
 
 %For records 6,12,15 (** Need to generalize)
 %TODO: Figure out how to determine this for other datasets
+% PLAN: identify the most prominent records (statistically) and set those
+% as records
 records = [6,12,15];
 % record_names =  ;
-
+% TODO: add a pritn statement to show which records are chosen 
 
 % TODO: find a way to automatically locate records we care about 
 filteredComments = filteredComments(arrayfun(@(x) ismember(x.record,[6,12,15]), filteredComments));
@@ -190,7 +249,7 @@ fprintf('\n ===== Relevant Data Calculated =====\n\n' );
 
 clearvars lastamp
 
-%% Output Formatting
+%% Data cleaning
 
 fprintf('\n ===== Preparing Output =====\n\n' );
 
@@ -201,38 +260,32 @@ fprintf('\n ===== Preparing Output =====\n\n' );
 channel_names = string({channel_meta(3:10).name});
 
 
-% new struct should be a superstruct with each record as one substruct
 % Assume each amp value has the "record_name" field 
+record_names = string(unique({output.record_name}));
 
-record_names = unique({output.record_name});
 
-newstructr1 = dictionary();
-newstructr2 = dictionary();
 
-for name_idx = 1:length(record_names)
-    newstructr1(record_names{name_idx}) = struct();
-    newstructr2(record_names{name_idx}) = struct();
-end
-%% old output formatting
-% newstructr1 = struct( 'amps', {output.str});
-% newstructr2 = struct( 'amps', {output.str});    
-% 
 
-for name_idx = 1:length(record_names)
-    structr1 = newstructr1(record_names{name_idx});
-    structr2 = newstructr2(record_names{name_idx});
-  for i = 1:numel(output)
+%% Old Data Cleaning
+newstructr1 = struct( 'amps', {output.str});
+newstructr2 = struct( 'amps', {output.str});
+
+
+for i = 1:numel(output)
     output(i).averager1 = output(i).sumr1 / output(i).count;
     output(i).averager2 = output(i).sumr2 / output(i).count;
-
-    structr1()
+    newstructr1(i).("record_name") = output(i).record_name;
+    newstructr2(i).("record_name") = output(i).record_name;
 
     for j = 1:numel(output(i).averager1)
         %store into new struct 
-        structr1(i).(channel_names(j)) = output(i).averager1(j);
-        structr2(i).(channel_names(j)) = output(i).averager2(j);
+        % TODO: add parameters that indicate which fields are needed
+
+        % TODO: add checks to include other information
+
+        newstructr1(i).(channel_names(j)) = output(i).averager1(j);
+        newstructr2(i).(channel_names(j)) = output(i).averager2(j);
     end
-  end
 end 
 
 clearvars x i maxminr1 j 
@@ -257,7 +310,7 @@ fprintf('\n Done! \n\n')
 fprintf('\n ===== detected R2/R1 ratio boolean, calculating... ===== \n\n' );
 
 outratio = outr2; % Initialize the new table with outr1's structure
-outratio{:, 2:9} = outr2{:, 2:9} ./ outr1{:, 2:9}; % Element-wise division
+outratio{:, 3:10} = outr2{:, 3:10} ./ outr1{:, 3:10}; % Element-wise division
 
 outrationame = 'Output/outputr2r1ratio.csv';
 writetable(outratio, outrationame);
@@ -266,20 +319,18 @@ fprintf(['\n ===== R2R1 ratio output to ' outrationame ' ===== \n\n'] );
 %% Plotting
 
 %incorporate plotting in the next draft. 
-PlotRC(outr1, 9, 3, 1,1);
+PlotRC(outr1, record_names,1,0,0);
+%TODO: render the data range variable obsolete
 
 % Plot each channel separately (for channel in list of channels plot
 % plot(amplitude, channel data) --> this way, channel data (in intensity)
 % will be plotted with each channel representing a different line
-% TODO: make this more intuitive... see other file. 
 
 %% Plot R2R1
-PlotRatioRC(outratio,9,3,0,0);
+PlotRC(outratio, record_names,1,1,1);
+% DONE: Incorporate ratio plot into normal RC plot, instead just plotting
+% the outratio file 
 
 
 %% Drafting Ground
-for i = record_names
-    fprintf(i)
-end
-
 % end

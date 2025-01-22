@@ -4,8 +4,6 @@ function confirmation = PlotRC(data, record_names, bool_normalize,bool_permuscle
     % repetition: integer, how many times should I plot the data_range of
     %amplitudes, since I put the amplitudes across 3 trials in the same
     %struct
-    % DONE: repeace range & repetition with something less convoluted 
-
 
     % bool_normalize: whether or not to normalize, data to the largest response of the muscle across stimulation locations -->  i.e., the global maximum across all stimulation locations of RRF would be 1 and the global minimum would be 0, everything else would be scaled accordingly.
 
@@ -14,7 +12,7 @@ function confirmation = PlotRC(data, record_names, bool_normalize,bool_permuscle
      % according to one channel (muscle) across all records, s.t. changes
      % in less stimulated muscles are exaggerrated
 
-    % TODO: Add a parameter to incorporate plotting ratio 
+    % DONE: Add a parameter to incorporate plotting ratio 
     % bool_ratio 
 
     
@@ -69,7 +67,7 @@ end
      %for r = 1:repetition %each of this will be a line in one graph
 
      for i = 3:data_width %First, define the columns
-        figure;
+        figure('visible','off');
         hold on;
         muscle_name = data.Properties.VariableNames{i};
 
@@ -77,7 +75,7 @@ end
             data_range = sum(strcmp(data.record_name, record_names(r)));
             curr_range = (1:data_range) + data_range * (r-1) ;
             x = data{curr_range,1};
-            channel = data{curr_range,i}; %TODO: change this so that it just loops through each column
+            channel = data{curr_range,i}; %DONE: change this so that it just loops through each column
             plot(x, channel, "DisplayName", record_names(r)); % DONE: change dispalyname to be the column name
         end
         % Customize plot
@@ -87,8 +85,10 @@ end
         legend('Location','best'); % or best outside;
         grid on;
         hold off;
-        
-        saveas(gcf, "Output/rcplot " + str_ratio + muscle_name + " " + str_normalize + str_global + ".png");
+
+        plot_name = "Output/rcplot " + str_ratio + muscle_name + " " + str_normalize + str_global + ".png";
+        saveas(gcf, plot_name);
+        fprintf(['plot saved as ' plot_name])
         clf; 
 
      end
@@ -96,7 +96,7 @@ end
     else %Plotting per record
      for r = 1:length(record_names)
         %First, extract x-axis (str.values)
-        figure;
+        figure('visible','off');
         hold on;
 
         data_range = sum(strcmp(data.record_name, record_names(r)));
@@ -117,7 +117,7 @@ end
             0.1216, 0.4667, 0.7059;  % Blue
         ];
         
-        for i = 3:data_width % TODO: change this st. it just goes through each column one by one
+        for i = 3:data_width % DONE: change this st. it just goes through each column one by one
             channel = data{curr_range,i}; %TODO: change this so that it just loops through each column
             % channel = channel(curr_range);
             plot(x, channel, "DisplayName",data.Properties.VariableNames{i}); % DONE: change dispalyname to be the column name
@@ -132,7 +132,9 @@ end
         grid on;
         hold off;
         
-        saveas(gcf, "Output/rcplot" + r  + str_ratio + str_normalize+ str_global + ".png");
+        plot_name = "Output/rcplot" + r  + str_ratio + str_normalize+ str_global + ".png";
+        saveas(gcf, plot_name);
+        fprintf(['plot saved as ' plot_name])
         clf; 
      end
 
