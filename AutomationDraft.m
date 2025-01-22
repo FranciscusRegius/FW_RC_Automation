@@ -13,7 +13,7 @@
 % bool_normalize: boolean whether or not to normalize the data, default true for now
 bool_normalize = 1; 
 % if nargin < 1
-    file_name = '20241007 RTA003 EPA 2 RC Only francis'; % Add a function that 
+    file_name = '20240408_RTA002_EPA3_RC ONLY TSS'; % Add a function that 
 % end
 path = [cd, '\Input\', file_name];
 % channels_to_use: allows choice of whcih channels to process; default to
@@ -116,7 +116,7 @@ records = setdiff(records,irrelevant_records);
 
 clearvars filtered_indices indices diffs boundaries i idx j irrelevant_records
 
-fprintf("\n ===== Relevant records identified as " + int2str(relevant_records)+ " =====\n\n");
+fprintf("\n ===== Relevant records identified as " + int2str(records)+ " =====\n\n");
 
 
 %% Filter away repetitive comments
@@ -327,17 +327,14 @@ fprintf(['\n ===== R2R1 ratio output to ' outrationame ' ===== \n\n'] );
 %% Plotting
 
 %incorporate plotting in the next draft. 
-PlotRC(outr1, record_names,1,0,0);
-%TODO: render the data range variable obsolete
+fprintf(['\n ===== Plotting ===== \n\n'] );
 
-% Plot each channel separately (for channel in list of channels plot
-% plot(amplitude, channel data) --> this way, channel data (in intensity)
-% will be plotted with each channel representing a different line
+PlotRC(outr1, record_names,0,0,0);
+
 
 %% Plot R2R1
-PlotRC(outratio, record_names,1,1,1);
-% DONE: Incorporate ratio plot into normal RC plot, instead just plotting
-% the outratio file 
+% fprintf(['\n ===== Plotting Ratio ===== \n\n'] );
+% PlotRC(outratio, record_names,1,1,1);
 
 
 %% Drafting Ground

@@ -116,7 +116,7 @@ records = setdiff(records,irrelevant_records);
 
 clearvars filtered_indices indices diffs boundaries i idx j irrelevant_records
 
-fprintf("\n ===== Relevant records identified as " + int2str(relevant_records)+ " =====\n\n");
+fprintf("\n ===== Relevant records identified as " + int2str(records)+ " =====\n\n");
 
 
 %% Filter away repetitive comments
@@ -162,6 +162,9 @@ clearvars sortIdx tick_pos record
 
 %DONE: Figure out how to determine this for other datasets
 
+% TODO: remove this line, as it has been rendered obsolete by new way of
+% doing things, assuming data is sufficiently clean and I don't have to do
+% more cleaning here 
 % filteredComments = filteredComments(arrayfun(@(x) ismember(x.record,records), filteredComments));
 
 
@@ -236,6 +239,7 @@ end
 
 %Remove irrelevant rows from filtered comments
 
+filteredComments(rows_to_remove) = [];
 
 %Outputting
 
@@ -265,7 +269,7 @@ channel_names = string({channel_meta(channels_to_use).name});
 
 
 % Assume each amp value has the "record_name" field 
-record_names = string(unique({output.record_name}));
+record_names = unique({output.record_name}); %For some reason this gives you results in a very random order
 
 
 
