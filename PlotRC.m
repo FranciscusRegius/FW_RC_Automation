@@ -67,13 +67,15 @@ end
      %for r = 1:repetition %each of this will be a line in one graph
 
      for i = 3:data_width %First, define the columns
-        figure('visible','off');
+        figure;
         hold on;
         muscle_name = data.Properties.VariableNames{i};
 
         for r = 1:length(record_names) %Plot each range of data as a separate line
-            data_range = sum(strcmp(data.record_name, record_names(r)));
-            curr_range = (1:data_range) + data_range * (r-1) ;
+
+
+            curr_range = ismember(data.record_name, record_names(r));
+
             x = data{curr_range,1};
             channel = data{curr_range,i}; %DONE: change this so that it just loops through each column
             plot(x, channel, "DisplayName", record_names(r)); % DONE: change dispalyname to be the column name
@@ -88,7 +90,7 @@ end
 
         plot_name = "Output/rcplot " + str_ratio + muscle_name + " " + str_normalize + str_global + ".png";
         saveas(gcf, plot_name);
-        fprintf(['plot saved as ' plot_name])
+        % fprintf(['plot saved as ' plot_name])
         clf; 
 
      end
@@ -96,12 +98,15 @@ end
     else %Plotting per record
      for r = 1:length(record_names)
         %First, extract x-axis (str.values)
-        figure('visible','off');
+        figure;
         hold on;
 
-        data_range = sum(strcmp(data.record_name, record_names(r)));
-        curr_range = (1:data_range) + data_range * (r-1) ;
-        x = data{curr_range,1};
+        % Instead: find the indices of the rows where strcmp evaluates to
+        % true 
+        % data_range = sum(strcmp(data.record_name, record_names(r)));
+        % curr_range = (1:data_range) + data_range * (r-1) ;
+        curr_range = ismember(data.record_name, record_names(r));
+        x = data{curr_range,1}; % extract the amplitudes 
         
         
         tab10 = [
@@ -134,7 +139,7 @@ end
         
         plot_name = "Output/rcplot" + r  + str_ratio + str_normalize+ str_global + ".png";
         saveas(gcf, plot_name);
-        fprintf(['plot saved as ' plot_name])
+        % fprintf(['plot saved as ' plot_name])
         clf; 
      end
 

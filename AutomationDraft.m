@@ -123,7 +123,7 @@ fprintf("\n ===== Relevant records identified as " + int2str(relevant_records)+ 
 % Create unique keys for all elements in comments
 fprintf('\n ===== Filtering Comments =====\n\n' );
 
-keys = arrayfun(@(x) sprintf('%s_%d_%s', x.str, x.tick_position, x.record), comments, "UniformOutput",false);
+keys = arrayfun(@(x) sprintf('%s_%d_%s', x.tick_position, x.record), comments, "UniformOutput",false);
 
 %find unique elements based on the keys
 [~, uniqueIdx] = unique(keys, 'stable');
@@ -162,7 +162,10 @@ clearvars sortIdx tick_pos record
 
 %DONE: Figure out how to determine this for other datasets
 
-filteredComments = filteredComments(arrayfun(@(x) ismember(x.record,[6,12,15]), filteredComments));
+% TODO: remove this line, as it has been rendered obsolete by new way of
+% doing things, assuming data is sufficiently clean and I don't have to do
+% more cleaning here 
+% filteredComments = filteredComments(arrayfun(@(x) ismember(x.record,records), filteredComments));
 
 
 fprintf('\n ===== Finding Peak to Peak =====\n\n' );
@@ -174,10 +177,10 @@ for i = 1:numel(filteredComments)
 %For each stimulation under the amplitude
 %   Find in data{record}, the max - min in the area tick+130 to tick+230
         % DONE: parameterize 3:10, which stands for the channels
-        windowsr1 = Data{x.record}(3:10, x.tick_position+R1_delay:x.tick_position+R2_delay);
+        windowsr1 = Data{x.record}(channels_to_use, x.tick_position+R1_delay:x.tick_position+R2_delay);
         maxminr1 = max(windowsr1, [],2) - min(windowsr1,[],2);
 
-        windowsr2 = Data{x.record}(3:10, x.tick_position+R2_delay:x.tick_position+R2_delay+window_size);
+        windowsr2 = Data{x.record}(channels_to_use, x.tick_position+R2_delay:x.tick_position+R2_delay+window_size);
         maxminr2 = max(windowsr2, [],2) - min(windowsr2,[],2);
 %   Store this information to maxminr1 field of filteredcomments
         filteredComments(i).maxminr1 = maxminr1;
@@ -194,6 +197,9 @@ clearvars R1_delay R2_delay windowsr2 windowsr1 maxminr2 maxminr1 x i window_siz
 
 %% Maxmin calculation
 
+%TODO: make sure that the positional comments are integrated into the name
+%of the stimulations
+
 
 %   Then, while averaging each max-min, merge elements with same record, amplitude,
 %   and stimulation
@@ -203,16 +209,23 @@ clearvars R1_delay R2_delay windowsr2 windowsr1 maxminr2 maxminr1 x i window_siz
 fprintf('\n ===== Calculating Peak to Peak related data =====\n\n' );
 
 lastamp = 1;
+last_loc = '';
 
 
+rows_to_remove = [];
 
 for i = 1:numel(filteredComments)
     x = filteredComments(i);
     if ischar(x.str)
-        filteredComments(lastamp).sumr1 = filteredComments(lastamp).sumr1 + x.maxminr1;
-        filteredComments(lastamp).sumr2 = filteredComments(lastamp).sumr2 + x.maxminr2;
-        filteredComments(lastamp).count = filteredComments(lastamp).count + 1;
-        filteredComments(lastamp).record_name = x.str;
+        if strcmp(x.str, 'stim')
+            filteredComments(lastamp).sumr1 = filteredComments(lastamp).sumr1 + x.maxminr1;
+            filteredComments(lastamp).sumr2 = filteredComments(lastamp).sumr2 + x.maxminr2;
+            filteredComments(lastamp).count = filteredComments(lastamp).count + 1;
+            filteredComments(lastamp).record_name = last_loc;
+        else 
+            last_loc = x.str;
+            rows_to_remove(end+1) = i;
+        end
 
     elseif isnumeric(x.str)
         lastamp = i;
@@ -223,6 +236,10 @@ for i = 1:numel(filteredComments)
        
     end 
 end
+
+%Remove irrelevant rows from filtered comments
+
+filteredComments(rows_to_remove) = [];
 
 %Outputting
 
@@ -248,11 +265,11 @@ fprintf('\n ===== Preparing Output =====\n\n' );
 % DONE: Clean up output, s.t. it only contains info we need 
 
 %Calculate average & store into new struct 
-channel_names = string({channel_meta(3:10).name});
+channel_names = string({channel_meta(channels_to_use).name});
 
 
 % Assume each amp value has the "record_name" field 
-record_names = string(unique({output.record_name}));
+record_names = unique({output.record_name}); %For some reason this gives you results in a very random order
 
 
 
@@ -301,7 +318,7 @@ fprintf('\n Done! \n\n')
 fprintf('\n ===== detected R2/R1 ratio boolean, calculating... ===== \n\n' );
 
 outratio = outr2; % Initialize the new table with outr1's structure
-outratio{:, 3:10} = outr2{:, 3:10} ./ outr1{:, 3:10}; % Element-wise division
+outratio{:, channels_to_use} = outr2{:, channels_to_use} ./ outr1{:, channels_to_use}; % Element-wise division
 
 outrationame = 'Output/outputr2r1ratio.csv';
 writetable(outratio, outrationame);
