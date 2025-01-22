@@ -62,7 +62,7 @@ channel_meta = Labchart.channel_meta  ;
 
 fprintf('\n ===== New file loading completed =====\n\n' );
 
-clearvars Labchart
+% clearvars Labchart
 
 
 %% Stimulation Location Determination
@@ -74,28 +74,31 @@ clearvars Labchart
     % Alternatively, assuming that channel 2 format is standard, we can
     % forgo normalizing and just find spots greater than 1
 % 3. notate each stimulation in the comments section  
+% NExt step, is to make sure the new format can determine R1 & r2
 
 % determine the records we care about, to reduce running time 
-relevant_records = unique([comments.record]);
+records = unique([comments.record]);
+irrelevant_records = [];
 
 % Go through each relevant record and determine all the stimulations by
 % looking at channel 2
 % Then add each of the stimulations to comments
-for idx = 1:length(relevant_records)
-    i = relevant_records(idx);
+for idx = 1:length(records)
+    i = records(idx);
 
     % extract channel 2 in the given record
     chnl2 = Data{1,i}(2,:); % ith column of the Data cell, everything in row 2
-
     % find the indices of stimulations as a list (i.e. tick position) 
     indices = find(chnl2 > 2); 
+
     if width(indices) == 0
+        irrelevant_records(end+1) = i;
         continue
     end
 
     %Remove repetitive stimulations
     diffs = diff(indices);
-    boundaries = [1 , find(diffs>3) + 1];
+    boundaries = [1 , find(diffs>window_size+3) + 1];
     filtered_indices = indices(boundaries);
     
     % for loop add them as str = 'stim', tick_position = index, record = i
@@ -109,12 +112,11 @@ for idx = 1:length(relevant_records)
     end
 end
 
+records = setdiff(records,irrelevant_records);
 
-clearvars filtered_indices indices diffs boundaries i idx j 
+clearvars filtered_indices indices diffs boundaries i idx j irrelevant_records
 
-%% Record autodetermination
-% TODO
-% Determine which records to use automatically, based on record size 
+fprintf("\n ===== Relevant records identified as " + int2str(relevant_records)+ " =====\n\n");
 
 
 %% Filter away repetitive comments
@@ -158,17 +160,8 @@ clearvars sortIdx tick_pos record
 
 %% Peak to peak calculation
 
-fprintf('\n ===== Extracting Useful Records =====\n\n' );
+%DONE: Figure out how to determine this for other datasets
 
-%For records 6,12,15 (** Need to generalize)
-%TODO: Figure out how to determine this for other datasets
-% PLAN: identify the most prominent records (statistically) and set those
-% as records
-records = [6,12,15];
-% record_names =  ;
-% TODO: add a pritn statement to show which records are chosen 
-
-% TODO: find a way to automatically locate records we care about 
 filteredComments = filteredComments(arrayfun(@(x) ismember(x.record,[6,12,15]), filteredComments));
 
 
