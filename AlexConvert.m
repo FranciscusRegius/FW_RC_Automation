@@ -1,4 +1,4 @@
-function newfilepath = AlexConvert(path1)
+function newfilepath = AlexConvert(path1, savepath)
     %Alternatively, output the 5 data structs that I need to use
 
     % ADI Convert creates a file that is just awful. Each channel gets its own
@@ -12,7 +12,7 @@ function newfilepath = AlexConvert(path1)
     % Modified by Fengyuan Wang 12/30 2024 to fix 
     
     % You need to run adi.convert first and import the data that it outputs.
-    % adi.convert converts LabChart files to MATLAB files (poorly), but we can
+    % adi.convert converts Labchart files to MATLAB files (poorly), but we can
     % fix it, we have the technology!
 
     % This modified version of the code requires a specific path input and
@@ -29,7 +29,7 @@ function newfilepath = AlexConvert(path1)
     % fullpath = strsplit(cd, filesep);
     % % Parent is the full path, but in text format
     % parent   = fullfile(fullpath{1:end},filesep);
-    % % Get all LabChart files (should be just one!!!!)
+    % % Get all Labchart files (should be just one!!!!)
     % files    = dir([parent '\*.adicht']);
     
     %% Step 1: Now with adi.convert step!
@@ -51,7 +51,7 @@ function newfilepath = AlexConvert(path1)
     
     fprintf('\n===== Step 1.5: Load the data! =====\n\n');
     
-    matfile_name = strsplit(path_ext, ".");
+    matfile_name = strsplit(path1, ".");
     load(matfile_name(1) + ".mat");
     
     fprintf('\n Done...\n\n');
@@ -144,12 +144,12 @@ function newfilepath = AlexConvert(path1)
     % FINAL STEP - SAVE DATA!!!
     % TODO: change save name s.t. it gets saved in Input folder
     
-    [parent, ~] = fileparts(mfilename('fullpath'));
-    [~,child] = matfile_name(1); 
+    [~,child] = fileparts(matfile_name(1)); 
+    %%
     
 
-    newfilepath = [parent, '/Input/', child, '.mat'];
-    save(newfilepath,'Labchart')
+    newfilepath = strcat(savepath, '/Input/', child, '.mat');
+    save(newfilepath,'Labchart');
     % save([savedir,savename '.set'],'EEG')
     
     fprintf('\n Done...\n\n');
