@@ -109,7 +109,7 @@ end
         x = data{curr_range,1}; % extract the amplitudes 
         
         
-        tab10 = [
+        tab10 = [ % curve palette
             1.0000, 0.4980, 0.0549;  % Orange
             0.1725, 0.6275, 0.1725;  % Green
             0.8392, 0.1529, 0.1569;  % Red
@@ -137,7 +137,7 @@ end
         grid on;
         hold off;
         
-        plot_name = "Output/rcplot" + r  + str_ratio + str_normalize+ str_global + ".png";
+        plot_name = "Output/rcplot" + r  + str_ratio + str_normalize+ str_global + "new.png";
         saveas(gcf, plot_name);
         % fprintf(['plot saved as ' plot_name])
         clf; 

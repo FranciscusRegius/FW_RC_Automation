@@ -1,4 +1,4 @@
-% function AutomationDraft(file_name)
+function AutomationDraft(file_name)
 % Automation Draft
 % labchart = adi.readFile("C:\Users\fengy\Desktop\HM\Dr Sayenko Lab\20240826_RTA006_EPA1_RC ONLY.adicht");
 
@@ -7,9 +7,9 @@
 
 %% List of parameters 
 
-% window_size: a numbers in ms - the size of the window, after each stimulation, wherein we look for the peak to peak
-%   % TODO: add an option to manually adjust window_size 
-% Delay: number in ms, the delay between admitted stimulation and the beginning of the sampling window
+
+% stim_interval: a numbers in ticks - the distance between stim 1 and 2, helps to calculate sampling window
+% delay: number in ticks, the delay between admitted stimulation and the beginning of the sampling window
 % bool_normalize: boolean whether or not to normalize the data, default true for now
 bool_normalize = 1; 
 % if nargin < 1
@@ -19,9 +19,19 @@ path = [cd, '\Input\', file_name];
 % channels_to_use: allows choice of whcih channels to process; default to
 % all channels other than 1&2
 channels_to_use = 3:10;
-window_size = 100;
+stim_interval = 100; % Represent distance between R1 & R2 delay
 R1_delay = 130;
-R2_delay = window_size + R1_delay;
+R2_delay = stim_interval + R1_delay;
+front_filter = 30 ;%how many ticks to reduce sampling window by to avoid artifact
+back_filter = 15;%how many ticks to reduce sampling window by to avoid artifact
+sampling_window = stim_interval - front_filter - back_filter;
+% The sampling window should start at delay + ff, and last for ws-ff-bf ticks
+
+%Sanity check, the combined front & back fitlers should not be greater than
+%window size 
+if sampling_window <= 0
+    warning('Sampling window does not exist! No data will be collected');
+end
 
 
 fprintf(['\n ===== Opening file ' file_name ' with Alex Chart =====\n\n'] );
@@ -30,27 +40,19 @@ fprintf(['\n ===== Opening file ' file_name ' with Alex Chart =====\n\n'] );
 % TODO: Add a check to make sure takes you to a .adicht or .mat file 
 
 
-%% Preprocessing
-% TODO: make sure Adi is laoded into the workspace
-% TODO: make sure Adi is installed for the user 
-%%adi.convert("C:\Users\fengy\Desktop\HM\Dr Sayenko Lab\20240826_RTA006_EPA1_RC ONLY.adicht");
+%% Preprocessing (Skip this step when no need, takes a lot of time)
 
-%%TODO: Find whatever adi's path is and add path to matlab path 
-% adi_path = [cd filesep ''];
-addpath adinstruments_sdk_matlab-master %Code
+%Load adi into path
+addpath adinstruments_sdk_matlab-master
 
-% DONE: run AlexConvertFile
-newfilepath = AlexChart(path); % This should load everything into workspace 
-% TODO: make sure AlexConvertFile is installed for the user, perhaps
-% incorporate his script into mine DONE: this is now a helper function in the
-% github
+% file_name = AlexChart(path); % This should load everything into workspace 
 
-%% Load data
+
+%%% Load data
 
 %first, load AlexChart processed data 
 
-load(newfilepath); % DONE: replace this, eventually, with AlexChart 
-
+% load(file_name); 
 
 %% Extract Labchart Fields
 % DONE: Saving and loading -- Decicde whether to have the data directly output by AlexChart function or save & load 
@@ -98,7 +100,7 @@ for idx = 1:length(records)
 
     %Remove repetitive stimulations
     diffs = diff(indices);
-    boundaries = [1 , find(diffs>window_size+3) + 1];
+    boundaries = [1 , find(diffs>stim_interval+3) + 1];
     filtered_indices = indices(boundaries);
     
     % for loop add them as str = 'stim', tick_position = index, record = i
@@ -176,11 +178,19 @@ for i = 1:numel(filteredComments)
         x = filteredComments(i);
 %For each stimulation under the amplitude
 %   Find in data{record}, the max - min in the area tick+130 to tick+230
+%   Find in data{record}, the max - min in the area tick+R1_delay+front_filter to tick+R1_delay+front_filter+sampling_window 
+
         % DONE: parameterize 3:10, which stands for the channels
-        windowsr1 = Data{x.record}(channels_to_use, x.tick_position+R1_delay:x.tick_position+R2_delay);
+        window_startr1 = x.tick_position+R1_delay+front_filter;
+        window_endr1 = window_startr1 + sampling_window;
+
+        windowsr1 = Data{x.record}(channels_to_use, window_startr1:window_endr1);
         maxminr1 = max(windowsr1, [],2) - min(windowsr1,[],2);
 
-        windowsr2 = Data{x.record}(channels_to_use, x.tick_position+R2_delay:x.tick_position+R2_delay+window_size);
+        window_startr2 = x.tick_position+R2_delay+front_filter;
+        window_endr2 = window_startr2 + sampling_window;
+
+        windowsr2 = Data{x.record}(channels_to_use, window_startr2:window_endr2);
         maxminr2 = max(windowsr2, [],2) - min(windowsr2,[],2);
 %   Store this information to maxminr1 field of filteredcomments
         filteredComments(i).maxminr1 = maxminr1;
@@ -262,8 +272,6 @@ clearvars lastamp
 fprintf('\n ===== Preparing Output =====\n\n' );
 
 
-% DONE: Clean up output, s.t. it only contains info we need 
-
 %Calculate average & store into new struct 
 channel_names = string({channel_meta(channels_to_use).name});
 
@@ -271,10 +279,7 @@ channel_names = string({channel_meta(channels_to_use).name});
 % Assume each amp value has the "record_name" field 
 record_names = unique({output.record_name}); %For some reason this gives you results in a very random order
 
-
-
-
-%% Old Data Cleaning
+% Final Calculation
 newstructr1 = struct( 'amps', {output.str});
 newstructr2 = struct( 'amps', {output.str});
 
@@ -338,4 +343,4 @@ PlotRC(outr1, record_names,0,0,0);
 
 
 %% Drafting Ground
-% end
+end
