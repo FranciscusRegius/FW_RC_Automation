@@ -5,6 +5,9 @@ function AutomationDraft(file_name)
 % Figure out how to load adiconvert 
 
 
+%%%% This file will be declared obsolete & a reference with the creation of the UI %%%%
+
+
 %% List of parameters 
 
 
@@ -13,7 +16,14 @@ function AutomationDraft(file_name)
 % bool_normalize: boolean whether or not to normalize the data, default true for now
 bool_normalize = 1; 
 % if nargin < 1
+
+    %TODO: add a parser s.t. the input is just a path but you can extract
+    %the file name
+    % TODO: Add a check to make sure takes you to a .adicht or .mat file 
+
+
     file_name = '20240408_RTA002_EPA3_RC ONLY TSS'; % Add a function that 
+
 % end
 path = [cd, '\Input\', file_name];
 % channels_to_use: allows choice of whcih channels to process; default to
@@ -37,7 +47,6 @@ end
 fprintf(['\n ===== Opening file ' file_name ' with Alex Chart =====\n\n'] );
 
 % path = 'C:\Users\fengy\Desktop\HM\Dr Sayenko Lab\FW_RC_Automation\20240826_RTA006_EPA1_RC ONLY.adicht'  ; %DEBUGGING:
-% TODO: Add a check to make sure takes you to a .adicht or .mat file 
 
 
 %% Preprocessing (Skip this step when no need, takes a lot of time)
@@ -45,14 +54,14 @@ fprintf(['\n ===== Opening file ' file_name ' with Alex Chart =====\n\n'] );
 %Load adi into path
 addpath adinstruments_sdk_matlab-master
 
-% file_name = AlexChart(path); % This should load everything into workspace 
+file_name = AlexChart(path); % This should load everything into workspace 
 
 
 %%% Load data
 
 %first, load AlexChart processed data 
 
-% load(file_name); 
+load(file_name); 
 
 %% Extract Labchart Fields
 % DONE: Saving and loading -- Decicde whether to have the data directly output by AlexChart function or save & load 
