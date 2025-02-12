@@ -148,7 +148,7 @@ function newfilepath = AlexConvert(path1, savepath)
     %%
     
 
-    newfilepath = strcat(savepath, '/Input/', child, '.mat');
+    newfilepath = strcat(savepath, filesep, 'Input', filesep, child, '.mat');
     save(newfilepath,'Labchart');
     % save([savedir,savename '.set'],'EEG')
     

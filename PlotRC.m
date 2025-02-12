@@ -42,10 +42,6 @@ function confirmation = PlotRC(data, record_names, bool_normalize,bool_permuscle
             str_global = "per muscle";
             data{:,3:data_width} = normalize(data{:, 3:data_width}, 'range');
          end
-
-        % for col = 2:9
-        %     outr3{:, col} = normalize(outr3{:, col}, 'range'); % Min-max normalization for each column
-        % end
         writetable(data, "Output/normalized_data.csv"); % TODO, see if you can give a table a title as a property
      end
 
@@ -62,9 +58,6 @@ end
     if str_global == "per muscle"
      %%Plotting per muscle 
 
-     %New plotting draft
-     %for i = 3:data_width %each column
-     %for r = 1:repetition %each of this will be a line in one graph
 
      for i = 3:data_width %First, define the columns
         figure;
