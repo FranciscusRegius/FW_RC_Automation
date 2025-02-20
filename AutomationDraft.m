@@ -65,11 +65,11 @@ load(file_name);
 
 %% Extract Labchart Fields
 % DONE: Saving and loading -- Decicde whether to have the data directly output by AlexChart function or save & load 
-Data = Labchart.Data          ;
-file_meta =Labchart.file_meta     ;
-comments =Labchart.comments      ;
-record_meta =Labchart.record_meta   ;
-channel_meta = Labchart.channel_meta  ;
+Data = Labchart.Data ;
+file_meta =Labchart.file_meta ;
+comments =Labchart.comments ;
+record_meta =Labchart.record_meta ;
+channel_meta = Labchart.channel_meta ;
 
 fprintf('\n ===== New file loading completed =====\n\n' );
 
