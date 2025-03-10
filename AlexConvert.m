@@ -144,9 +144,7 @@ function newfilepath = AlexConvert(path1, savepath)
     % FINAL STEP - SAVE DATA!!!
     % TODO: change save name s.t. it gets saved in Input folder
     
-    [~,child] = fileparts(matfile_name(1)); 
-    %%
-    
+    [~,child] = fileparts(matfile_name(1));     
 
     newfilepath = strcat(savepath, filesep, 'Input', filesep, child, '.mat');
     save(newfilepath,'Labchart');

@@ -22,7 +22,7 @@ bool_normalize = 1;
     % TODO: Add a check to make sure takes you to a .adicht or .mat file 
 
 
-    file_name = '20240408_RTA002_EPA3_RC ONLY TSS'; % Add a function that 
+    file_name = '20240820 RTA003 EPA1_RC ONLY TSS'; % Add a function that 
 
 % end
 path = [cd, '\Input\', file_name];
@@ -49,19 +49,19 @@ fprintf(['\n ===== Opening file ' file_name ' with Alex Chart =====\n\n'] );
 % path = 'C:\Users\fengy\Desktop\HM\Dr Sayenko Lab\FW_RC_Automation\20240826_RTA006_EPA1_RC ONLY.adicht'  ; %DEBUGGING:
 
 
-%% Preprocessing (Skip this step when no need, takes a lot of time)
-
-%Load adi into path
-addpath adinstruments_sdk_matlab-master
-
-file_name = AlexChart(path); % This should load everything into workspace 
-
-
-%%% Load data
-
-%first, load AlexChart processed data 
-
-load(file_name); 
+% %% Preprocessing (Skip this step when no need, takes a lot of time)
+% 
+% %Load adi into path
+% addpath adinstruments_sdk_matlab-master
+% 
+% file_name = AlexChart(path); % This should load everything into workspace 
+% 
+% 
+% %%% Load data
+% 
+% %first, load AlexChart processed data 
+% 
+% load(file_name); 
 
 %% Extract Labchart Fields
 % DONE: Saving and loading -- Decicde whether to have the data directly output by AlexChart function or save & load 
@@ -74,6 +74,49 @@ channel_meta = Labchart.channel_meta ;
 fprintf('\n ===== New file loading completed =====\n\n' );
 
 % clearvars Labchart
+
+
+
+
+%% Filter away repetitive comments
+% Create unique keys for all elements in comments
+fprintf('\n ===== Filtering Comments =====\n\n' );
+
+keys = arrayfun(@(x) sprintf('%s_%d_%s', x.tick_position, x.record), comments, "UniformOutput",false);
+
+%find unique elements based on the keys
+[~, uniqueIdx] = unique(keys, 'stable');
+
+% FInally, filter out repetitions 
+comments = comments(uniqueIdx);
+
+clearvars keys uniqueIdx
+
+
+%% Format data
+
+fprintf('\n ===== Formatting Data =====\n\n' );
+
+% Convert all amplitudes into double from string
+for i = 1:numel(comments)
+    %First, filter out everything in the "str" field that is not a double
+    if ~isempty(regexp(comments(i).str, '^-?\d+$', 'once'))
+        comments(i).str = str2double(comments(i).str);
+    else 
+        comments(i).tick_position = 0;
+    end
+end
+
+%Sort data first accroding to record, then according to tick_position
+record = [comments.record];
+tick_pos = [comments.tick_position];
+
+[~,sortIdx] = sortrows([record(:), ...
+                tick_pos(:)], ...
+                [1,2]);
+comments = comments(sortIdx);
+
+clearvars sortIdx tick_pos record
 
 
 %% Stimulation Location Determination
@@ -125,49 +168,18 @@ end
 
 records = setdiff(records,irrelevant_records);
 
+ % Once again, sort data first accroding to record, then according to tick_position
+    record = [comments.record];
+    tick_pos = [comments.tick_position];
+    
+    [~,sortIdx] = sortrows([record(:), ...
+                    tick_pos(:)], ...
+                    [1,2]);
+    comments = comments(sortIdx);
+
 clearvars filtered_indices indices diffs boundaries i idx j irrelevant_records
 
 fprintf("\n ===== Relevant records identified as " + int2str(records)+ " =====\n\n");
-
-
-%% Filter away repetitive comments
-% Create unique keys for all elements in comments
-fprintf('\n ===== Filtering Comments =====\n\n' );
-
-keys = arrayfun(@(x) sprintf('%s_%d_%s', x.tick_position, x.record), comments, "UniformOutput",false);
-
-%find unique elements based on the keys
-[~, uniqueIdx] = unique(keys, 'stable');
-
-% FInally, filter out repetitions 
-filteredComments = comments(uniqueIdx);
-
-clearvars keys uniqueIdx
-
-
-%% Format data
-
-fprintf('\n ===== Formatting Data =====\n\n' );
-
-% Convert all amplitudes into double from string
-for i = 1:numel(filteredComments)
-    %First, filter out everything in the "str" field that is not a double
-    if ~isempty(regexp(filteredComments(i).str, '^-?\d+$', 'once'))
-        filteredComments(i).str = str2double(filteredComments(i).str);
-    end
-end
-
-%Sort data first accroding to record, then according to tick_position
-record = [filteredComments.record];
-tick_pos = [filteredComments.tick_position];
-
-[~,sortIdx] = sortrows([record(:), ...
-                tick_pos(:)], ...
-                [1,2]);
-filteredComments = filteredComments(sortIdx);
-
-clearvars sortIdx tick_pos record
-
 
 %% Peak to peak calculation
 
@@ -176,15 +188,15 @@ clearvars sortIdx tick_pos record
 % TODO: remove this line, as it has been rendered obsolete by new way of
 % doing things, assuming data is sufficiently clean and I don't have to do
 % more cleaning here 
-% filteredComments = filteredComments(arrayfun(@(x) ismember(x.record,records), filteredComments));
+% comments = comments(arrayfun(@(x) ismember(x.record,records), comments));
 
 
 fprintf('\n ===== Finding Peak to Peak =====\n\n' );
 
 % For each comment:
-for i = 1:numel(filteredComments)
-    if ischar(filteredComments(i).str)
-        x = filteredComments(i);
+for i = 1:numel(comments)
+    if ischar(comments(i).str)
+        x = comments(i);
 %For each stimulation under the amplitude
 %   Find in data{record}, the max - min in the area tick+130 to tick+230
 %   Find in data{record}, the max - min in the area tick+R1_delay+front_filter to tick+R1_delay+front_filter+sampling_window 
@@ -201,9 +213,9 @@ for i = 1:numel(filteredComments)
 
         windowsr2 = Data{x.record}(channels_to_use, window_startr2:window_endr2);
         maxminr2 = max(windowsr2, [],2) - min(windowsr2,[],2);
-%   Store this information to maxminr1 field of filteredcomments
-        filteredComments(i).maxminr1 = maxminr1;
-        filteredComments(i).maxminr2 = maxminr2;
+%   Store this information to maxminr1 field of comments
+        comments(i).maxminr1 = maxminr1;
+        comments(i).maxminr2 = maxminr2;
     %else, the fields are empty --> []
 
     end 
@@ -233,14 +245,14 @@ last_loc = '';
 
 rows_to_remove = [];
 
-for i = 1:numel(filteredComments)
-    x = filteredComments(i);
+for i = 1:numel(comments)
+    x = comments(i);
     if ischar(x.str)
         if strcmp(x.str, 'stim')
-            filteredComments(lastamp).sumr1 = filteredComments(lastamp).sumr1 + x.maxminr1;
-            filteredComments(lastamp).sumr2 = filteredComments(lastamp).sumr2 + x.maxminr2;
-            filteredComments(lastamp).count = filteredComments(lastamp).count + 1;
-            filteredComments(lastamp).record_name = last_loc;
+            comments(lastamp).sumr1 = comments(lastamp).sumr1 + x.maxminr1;
+            comments(lastamp).sumr2 = comments(lastamp).sumr2 + x.maxminr2;
+            comments(lastamp).count = comments(lastamp).count + 1;
+            comments(lastamp).record_name = last_loc;
         else 
             last_loc = x.str;
             rows_to_remove(end+1) = i;
@@ -248,23 +260,23 @@ for i = 1:numel(filteredComments)
 
     elseif isnumeric(x.str)
         lastamp = i;
-        filteredComments(lastamp).sumr1 = 0;
-        filteredComments(lastamp).sumr2 = 0;
-        filteredComments(lastamp).count = 0;
-        filteredComments(lastamp).record_name = '';
+        comments(lastamp).sumr1 = 0;
+        comments(lastamp).sumr2 = 0;
+        comments(lastamp).count = 0;
+        comments(lastamp).record_name = '';
        
     end 
 end
 
 %Remove irrelevant rows from filtered comments
 
-filteredComments(rows_to_remove) = [];
+comments(rows_to_remove) = [];
 
 %Outputting
 
 %filter array to only have amplitude left
 %TODO, change the name output here 
-output = filteredComments(arrayfun(@(x) isnumeric(x.str), filteredComments));
+output = comments(arrayfun(@(x) isnumeric(x.str), comments));
 
 %Sanity check
 % if len(output.averager1) == len(channels_to_use)
@@ -350,6 +362,5 @@ PlotRC(outr1, record_names,0,0,0);
 % fprintf(['\n ===== Plotting Ratio ===== \n\n'] );
 % PlotRC(outratio, record_names,1,1,1);
 
-
-%% Drafting Ground
 end
+%% Drafting Ground
