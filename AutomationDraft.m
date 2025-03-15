@@ -181,6 +181,7 @@ clearvars filtered_indices indices diffs boundaries i idx j irrelevant_records
 
 fprintf("\n ===== Relevant records identified as " + int2str(records)+ " =====\n\n");
 
+
 %% Peak to peak calculation
 
 %DONE: Figure out how to determine this for other datasets
@@ -364,3 +365,10 @@ PlotRC(outr1, record_names,0,0,0);
 
 end
 %% Drafting Ground
+rows = 3:10; % Example array of specific rows you want
+newCell = cellfun(@(x) x(rows, :), data, 'UniformOutput', false);
+plot(newCell{2}(3, :)); % 3rd row of the 2nd cell
+xlabel('Column Index');
+ylabel('Value');
+title('Plot of 3rd Row from 2nd Cell');
+
